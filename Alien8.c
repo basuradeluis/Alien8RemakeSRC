@@ -1,5 +1,5 @@
 //******************************************************************************
-// alien8.c 
+// alien8.c
 // Función main() y funciones de estado.
 // Por Ignacio Pérez Gil 18/05/2008.
 //******************************************************************************
@@ -8,12 +8,12 @@
 // mi padre era un transistó,
 // y escuchando un disco de Kraftwerk
 // mi padre a mi madre la antena le metió.
-// 
+//
 // Le echó dos voltios sin sacarla, la antena,
 // y de allí nasío yo.
 // Y aunque soy una máquina mecánica soy,
 // la vergüensa de tó los robó.
-// 
+//
 // Soy un consoladó,
 // soy una máquina de haser el amor,
 // si quieres que te haga felí,
@@ -49,30 +49,85 @@ void escribir_cfg(void);
 void elegir_idioma(void);
 void intro(void);
 
+void luisComprobarParametros(int argc,char **argv);
+int globalLuisSonidoDesactivado=0;
+int globalLuisIntroDesactivada=0;
+int globalLuisHabitacionInicial=0;
+int globalLuisMostrarFinalJuego=0;
+int globalLuisJugarDirectamente=0;
+
+
+ void luisComprobarParametros(int argc,char ** argv){
+     int i;
+     int valor;
+
+     puts("Pulse F11 para salida inmediata del juego\n");
+
+     for (i=0;i<argc;i++){
+        if (!(strcasecmp(argv[i],"-nosound"))){
+             globalLuisSonidoDesactivado=1;
+        }
+        if (!(strcasecmp(argv[i],"-nointro"))){
+             globalLuisIntroDesactivada=1;
+        }
+        if (!(strcasecmp(argv[i],"-habitacioninicial"))){
+            globalLuisHabitacionInicial=atoi(argv[i+1]);
+            i++;
+        }
+        if (!(strcasecmp(argv[i],"-mostrarfinal"))){
+            globalLuisMostrarFinalJuego=1;
+        }
+
+        if (!(strcasecmp(argv[i],"-jugar"))){
+            globalLuisJugarDirectamente=1;
+        }
+
+
+     }
+ }
+
 //******************************************************************************
 // Función main()
 //    Bucle principal.
 //******************************************************************************
-int main(void)
+int main(int argc, const char* argv[] )
 {
  char (*funcion_estado[6])(void)={menu,juego,creditos,opciones,preguntar,redefinir};
  char estado=EST_MENU;
 
+
  allegro_init();
  set_uformat(U_ASCII);
  leer_cfg();
- if(ini_video()) return -1;
- if(comprobar_dats()) return -1;
+ if(ini_video()) {
+     printf("Error al inicializar video\n");
+     return -1;
+ }
+
+ luisComprobarParametros(argc,argv);
+
+ if (globalLuisJugarDirectamente)
+    estado=EST_JUEGO;
+
+ if(comprobar_dats()){
+     printf("Faltans dats\n");
+    return -1;
+ }
  ini_juego();
  ini_tiempo();
  ini_entrada();
  ini_audio();
 
  clear_bitmap(buffer);
- intro();
- if(idioma==2) elegir_idioma();
 
- while(estado!=EST_SALIR) estado=funcion_estado[estado]();
+ if (!globalLuisIntroDesactivada)
+    intro();
+
+ if (idioma==2)
+    elegir_idioma();
+
+ while(estado!=EST_SALIR)
+    estado=funcion_estado[estado]();
 
  fin_juego();
  return 0;

@@ -13,6 +13,11 @@
 #include "tcj.h"
 #include "audio.h"
 
+
+extern int globalLuisHabitacionInicial;
+extern int globalLuisMostrarFinalJuego;
+int salidaInmediata=0;
+
 unsigned char h;
 char puerta[4];
 unsigned char dx, dy;
@@ -91,7 +96,9 @@ void ini_partida(void);
 #define fm_llave(_T_,_N_)      (BITMAP *)(f_anim[_N_+LLAVE_0+1+_T_*11].dat)
 #define fm_sombra_llave(_T_)   (BITMAP *)(f_anim[_T_*11+LLAVE_0].dat)
 #define fm_nums_al(_T_)        (BITMAP *)(f_anim[_T_+NUMS_AL_0+oscuridad*2].dat)
+#define fm_disparo()            (BITMAP *)(f_anim[138].dat)
 
+#define DURACION_TABURETE   2999
 // Datos para los objetos con función de movimiento.
 // La posición 0 está reservada para Nacho.
 // Las posiciones 1 y 2 están reservadas para las llaves.
@@ -106,6 +113,8 @@ struct{
  char dir;
  short g;
  char empujable;
+ char tipoObjeto;
+ //LUIS
 } movs[MAX_MOVS];
 char primera_cascara; // Índice de la primera cáscara.
 char primera_mina_voladora; // Índice de la primera mina voladora.
@@ -182,6 +191,8 @@ char pausa(void);
 void reprogramar(void);
 void detener_nave(void);
 void mostrar_resultado(void);
+void moverDisparo(char f);//Luis
+void moverTaburete(char f);//Luis
 
 // Datos y función para los dígitos del contador de años luz
 unsigned char pos_a_luz[4], dec_pos_a_luz, oscuridad;
@@ -202,7 +213,7 @@ void ini_juego()
 {
  unsigned char f,n;
  int r,g,b;
- 
+
  for(f=1;f<NUM_HABS;f++)
    hab[f].n+=hab[f-1].n;
  buffer=create_bitmap(RES_X,RES_Y);
@@ -277,9 +288,13 @@ char juego(void)
 {
  char f;//,tmp=1;
  int terminar=0;
+ char txtHabitacionActual[80];
+ int posXNacho,posYNacho,posZNacho;
 
  puede_saltar=trampas=0;
  dt_anim_nacho.cont=dt_anim_nacho.fot=dt_anim_nacho.tipo=dt_anim_nacho.dirini=0;
+
+ int pulsadoF10=0,pulsadoF9=0;
 
  if(nuevo_marcador)
   {
@@ -316,9 +331,69 @@ char juego(void)
      trampas=1;
     }
 
-   for(f=0;f<num_movs;f++) movs[f].mover(f);
-   if(sonido_empujar) sonido_empujar--;
+//ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
+//MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO, CERRADURAS,LOSETAS Q SE MUEVEN...
+   for(f=0;f<num_movs;f++){
+       if (movs[f].mover!=NULL)
+            movs[f].mover(f);
+
+   }
+
+   if(sonido_empujar)
+        sonido_empujar--;
    ism_dibujar_mundo_isom(buffer,x_org,y_org);
+
+
+   if ((pulsadoF10==0) && (key[KEY_F10])  )  {
+        pulsadoF10=1;
+        crearDisparo();
+    }
+    if (!key[KEY_F10]){
+        pulsadoF10=0;
+    }
+ if ((pulsadoF9==0) && (key[KEY_F9])  )  {
+        pulsadoF9=1;
+        crearTaburete();
+    }
+    if (!key[KEY_F9]){
+        pulsadoF9=0;
+    }
+
+
+   int color1,color2;
+   color1= makecol(255,255,0);
+   color2= makecol(0,0,0);
+
+   sprintf(txtHabitacionActual,"Hab: %d ",h);//Luis
+   textout_ex(buffer, font, txtHabitacionActual, 80, 10, -1, -1);
+
+   sprintf(txtHabitacionActual,"Cerraduras completadas(24): %d ",dt_partida.cerraduras);
+   textout_ex(buffer, font, txtHabitacionActual, 150, 10, -1, -1);
+
+   sprintf(txtHabitacionActual,"                                     ");
+   textout_ex(buffer, font, txtHabitacionActual, 400, 30, -1, -1);
+   sprintf(txtHabitacionActual,"dirNacho: %d ",(signed int) (movs[0].dir));
+   textprintf_ex(buffer, font,400,30, color1,color2, "dirNacho: %d ",(signed int) (movs[0].dir));
+
+     //luis
+   ism_obtener_coords_objeto(movs[0].id, &posXNacho, &posYNacho, &posZNacho);
+
+
+   textprintf_ex(buffer, font, 80,  30, color1,color2,"Pos x: %3d",posXNacho);
+   textprintf_ex(buffer, font, 180, 30, color1,color2,"Pos y: %3d",posYNacho);
+   textprintf_ex(buffer, font, 80,  50, color1,color2,"Pos z: %3d",posZNacho);
+   textprintf_ex(buffer, font, 180, 50, color1,color2,"g    : %2d",movs[0].g);
+
+
+
+
+
+   if ( key[KEY_F11]){
+    salidaInmediata=1;
+    terminar=1;
+   }
+
+
    if(trampas)
      textout_ex(buffer, font, "*", 10, 10, -1, -1);
    else
@@ -334,9 +409,13 @@ char juego(void)
    dibujar_a_luz();
    fm_volcar();
    if(sonido_autom>0) sonido_autom--;
-   if(tcj_estado[TCJ_AC3]) terminar=pausa();
+   if(tcj_estado[TCJ_AC3])
+        terminar=pausa();
   }while(!terminar && dt_partida.cerraduras<24 && dt_partida.vidas>=0 &&
          (pos_a_luz[0]<180 || pos_a_luz[1]<180 || pos_a_luz[2]<180 || pos_a_luz[3]<180));
+
+ if (globalLuisMostrarFinalJuego)
+  detener_nave();
 
  detener_sonidos(1);
  parar_musica();
@@ -349,8 +428,260 @@ char juego(void)
    mostrar_resultado();
   }
  detener_sonidos(1);
- if(terminar) reproducir_sonido(23,PLAYMODE_PLAY);
+ if(terminar)
+    reproducir_sonido(23,PLAYMODE_PLAY);
+
+ if (salidaInmediata)
+    return EST_SALIR;
+
+
  return (terminar||trampas||dt_partida.cerraduras==0?EST_MENU:EST_PREGUNTAR);
+}
+
+
+
+
+void crearDisparo(){
+    int posX,posY,posZ;
+    int dirNacho=movs[0].dir;
+    ism_id nuevoId;
+    printf("Creando disparo\n");
+
+    ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
+
+    switch(dirNacho){
+        case 1:
+            posY=posY+ANCHO_CELDA;
+            break;
+        case 3:
+            posY=posY-ANCHO_CELDA;
+            break;
+        case 2:
+            posX=posX-ANCHO_CELDA;
+            break;
+        case 0:
+            posX=posX+ANCHO_CELDA;
+            break;
+
+
+
+    }
+    printf("Creando disparo en %d %d %d\n",posX,posY,posZ);
+
+    nuevoId=ism_colocar_objeto_libre(posX,posY,posZ+2,6,6,8,//ANCHO_CELDA,ANCHO_CELDA,ALTURA_BASE,
+                                              fm_disparo() /*  fm_nacho_aplastado()*/,NULL);
+    if (nuevoId==ID_ERROR ){
+            printf("Error al crear disparo\n");
+            puts(ism_desc_error());
+            return;
+
+    }
+
+    movs[num_movs].id=nuevoId;
+
+    movs[num_movs].m0=0;//Duracion del disparo
+    movs[num_movs].m1=0;
+    movs[num_movs].empujable=0;
+    movs[num_movs].anclado=NO_ID;
+    movs[num_movs].dir=dirNacho;
+    movs[num_movs].mover=moverDisparo;
+    num_movs++;
+
+}
+
+
+/*****************************
+problema:dado un id de ojbeto no es facil que tipo es
+solucion:cambiar CARGARHAB PARA QUE LO ALMACENE
+
+*********************************/
+void moverDisparo(char f){
+    //printf("intentan mover el disparo %d",f);
+
+
+    unsigned char datoACambiar;//Ejes
+    int valor=0;
+    int rc=0,numColisiones,i,j,k,colisionActual;
+    int destruir;
+
+    if (movs[f].m0>=2999)
+        return;
+
+    if ( (movs[f].dir==1) || (movs[f].dir==3) ) //Eje que vamos a cambiar segun la direccion del disparo:
+        datoACambiar=D_Y;
+    else
+        datoACambiar=D_X;
+
+
+    if ( (movs[f].dir==1) || (movs[f].dir==0) ) //Sumar o restar , segun la direccion tambien
+        valor=2;
+    else
+        valor=-2;
+
+    rc=ism_cambiar_dato_objeto(movs[f].id,datoACambiar,valor,SUMAR);
+    if (rc){
+        //puts("kaske al mover disparo\n");
+        //puts(ism_desc_error());
+        numColisiones=ism_num_colisiones();
+        //printf("He chocado con %d objetos:\n",numColisiones);
+
+        for (i=0;i<numColisiones;i++){
+            ism_id idColisionActual=ism_extraer_id_blq();
+            destruir=0;
+            for(j=0;j<num_obst;j++){ // Comprobamos si hemos chocado con un obstáculo:
+                if(id_obst[j]==idColisionActual) {
+                    puts("Disparo chocó con un obstaculo\n");
+                    //FALTARIA KITARLO DEL ARRAY DE OBSTACULOS O AL MENOS NO MARCARLO?
+                    destruir=1;
+                }
+            }
+            for (k=0;k<num_movs;k++){
+                if (movs[k].id==idColisionActual){
+                    movs[k].mover=NULL;
+                    puts("Disparo chocó con un obj movible\n");
+                    destruir=1;
+                }
+            }
+            if (destruir){
+                rc=ism_quitar_objeto(idColisionActual);
+                if (rc){
+                    puts("kaske al desaparecer obstaculo\n");
+                    puts(ism_desc_error());
+                }
+            }
+        }
+        //Destruimos el objeto disparo:
+        movs[f].m0=9999;
+        rc=ism_quitar_objeto(movs[f].id);
+        if (rc){
+            puts("kaske al desaparecer disparo\n");
+            puts(ism_desc_error());
+        }
+        movs[f].mover=NULL;
+
+    }
+
+  /*  movs[f].m0=movs[f].m0+10;
+    if (movs[f].m0>=2999){
+        rc=ism_quitar_objeto(movs[f].id);
+        if (rc){
+            puts("kaske al desaparecer disparo\n");
+            puts(ism_desc_error());
+        }
+    }*/
+    return;
+
+}
+
+
+
+
+void crearTaburete(){
+    int posX,posY,posZ;
+    int dirNacho=movs[0].dir;
+    ism_id nuevoId;
+    printf("Creando taburete\n");
+
+    ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
+
+    switch(dirNacho){
+        case 1:
+            posY=posY+ANCHO_CELDA;
+            break;
+        case 3:
+            posY=posY-ANCHO_CELDA;
+            break;
+        case 2:
+            posX=posX-ANCHO_CELDA;
+            break;
+        case 0:
+            posX=posX+ANCHO_CELDA;
+            break;
+    }
+
+    printf("Creando taburete en %d %d %d\n",posX,posY,posZ);
+
+    nuevoId=ism_colocar_objeto_libre(posX,posY,posZ+1,ANCHO_CELDA-1,ANCHO_CELDA-1,ALTURA_BASE,
+                                               fm_nacho_aplastado(),NULL);
+    if (nuevoId==ID_ERROR ){
+            printf("Error al crear taburete\n");
+            puts(ism_desc_error());
+            return;
+
+    }
+
+    movs[num_movs].id=nuevoId;
+
+    movs[num_movs].m0=0;//Duracion del taburete
+    movs[num_movs].m1=0;
+    movs[num_movs].empujable=0;
+    movs[num_movs].anclado=NO_ID;
+    movs[num_movs].dir=dirNacho;
+    movs[num_movs].mover=moverTaburete;
+    num_movs++;
+
+}
+
+void moverTaburete(char f){
+    //printf("intentan mover el taburete %d",f);
+
+    unsigned char datoACambiar;//Ejes
+    int valor=0;
+    int rc=0,numColisiones,i,j,colisionActual;
+
+    if (movs[f].m0>=DURACION_TABURETE)
+        return;
+
+    if ( (movs[f].dir==1) || (movs[f].dir==3) ) //Eje que vamos a cambiar segun la direccion del taburete moviendose:
+        datoACambiar=D_Y;
+    else
+        datoACambiar=D_X;
+
+
+    if ( (movs[f].dir==1) || (movs[f].dir==0) ) //Sumar o restar , segun la direccion tambien
+        valor=2;
+    else
+        valor=-2;
+
+    rc=ism_cambiar_dato_objeto(movs[f].id,datoACambiar,valor,SUMAR);
+    if (rc){
+        //puts("kaske al mover taburete\n");
+        //puts(ism_desc_error());
+    }
+
+    movs[f].m0=movs[f].m0+10;
+    if (movs[f].m0>=DURACION_TABURETE){
+        rc=ism_quitar_objeto(movs[f].id);
+        if (rc){
+            puts("kaske al desaparecer taburete\n");
+            puts(ism_desc_error());
+        }
+        movs[f].mover=NULL;
+    }
+    return;
+
+}
+
+
+void buscarObjetoMovible(ism_id idABuscar){
+
+    int i,j,rc;
+/*
+    for (i=0;i<num_movs;i++){
+        if (movs[i].id==idABuscar){
+            return (movs[i].mover);
+        }
+
+
+    }
+    return NULL;
+*/
+}
+
+
+void dimeTipoObjeto(ism_id idABuscar){
+
+
 }
 
 //******************************************************************************
@@ -404,21 +735,21 @@ void dibujar_a_luz(void)
         {la[f]=colores_al_16[oscuridad][0][3];}
        else if(la[f]==colores_al_16[oscuridad][1][0])
         {la[f]=colores_al_16[oscuridad][1][3];}
-  
+
        if(l0[f]==colores_al_16[oscuridad][2][0])
         {l0[f]=colores_al_16[oscuridad][2][1];}
        else if(l0[f]==colores_al_16[oscuridad][0][0])
         {l0[f]=colores_al_16[oscuridad][0][1];}
        else if(l0[f]==colores_al_16[oscuridad][1][0])
         {l0[f]=colores_al_16[oscuridad][1][1];}
-  
+
        if(l1[f]==colores_al_16[oscuridad][2][0])
         {l1[f]=colores_al_16[oscuridad][2][2];}
        else if(l1[f]==colores_al_16[oscuridad][0][0])
         {l1[f]=colores_al_16[oscuridad][0][2];}
        else if(l1[f]==colores_al_16[oscuridad][1][0])
         {l1[f]=colores_al_16[oscuridad][1][2];}
-  
+
        if(l2[f]==colores_al_16[oscuridad][2][0])
         {l2[f]=colores_al_16[oscuridad][2][2];}
        else if(l2[f]==colores_al_16[oscuridad][0][0])
@@ -432,7 +763,7 @@ void dibujar_a_luz(void)
         {l3[f]=colores_al_16[oscuridad][0][1];}
        else if(l3[f]==colores_al_16[oscuridad][1][0])
         {l3[f]=colores_al_16[oscuridad][1][1];}
-  
+
        if(lb[f]==colores_al_16[oscuridad][2][0])
         {lb[f]=colores_al_16[oscuridad][2][3];}
        else if(lb[f]==colores_al_16[oscuridad][0][0])
@@ -720,8 +1051,8 @@ void detener_nave(void)
          b=getb(c);b=(b>8?b-8:0);
          putpixel(buffer,x,y,makecol(r,g,b));
         }
-   fm_volcar(); 
-   fm_volcar(); 
+   fm_volcar();
+   fm_volcar();
   }
 
  // Comienza la música, y esperamos tres segundos en negro.
@@ -741,8 +1072,8 @@ void detener_nave(void)
        b=getb(c);b=(b>f?f:b);
        putpixel(buffer,x,y,makecol(r,g,b));
       }
-   fm_volcar(); 
-   fm_volcar(); 
+   fm_volcar();
+   fm_volcar();
   }
 
  // Esperamos dos segundos.
@@ -761,7 +1092,7 @@ void detener_nave(void)
 
  // Esperamos tres segundos.
  for(f=0;f<TICKS*3;f++) {reproducir_musica(100);fm_volcar();}
-     
+
  // Apagamos el primer mensaje y encendemos el segundo.
  for(f=10;f<251;f+=4)
   {
@@ -791,8 +1122,8 @@ void detener_nave(void)
          b=getb(c);b=(b>8?b-8:0);
          putpixel(buffer,x,y,makecol(r,g,b));
         }
-   fm_volcar(); 
-   fm_volcar(); 
+   fm_volcar();
+   fm_volcar();
   }
 
  // Fundido a blanco a lo bestia de la segunda imágen.
@@ -808,8 +1139,8 @@ void detener_nave(void)
        b=getb(c);b=(b>f?f:b);
        putpixel(buffer,x,y,makecol(r,g,b));
       }
-   fm_volcar(); 
-   fm_volcar(); 
+   fm_volcar();
+   fm_volcar();
   }
 
  // Esperamos cuatro segundos.
@@ -842,8 +1173,8 @@ void detener_nave(void)
          b=getb(c);b=(b>8?b-8:0);
          putpixel(buffer,x,y,makecol(r,g,b));
         }
-   fm_volcar(); 
-   fm_volcar(); 
+   fm_volcar();
+   fm_volcar();
   }
 
  // Esperamos dos segundos.
@@ -1313,8 +1644,8 @@ void cargar_hab(void)
       ism_colocar_objeto_rejilla(0,9,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(3,9,0,1000,NULL,NULL);
 
-      puerta[0]=puerta[2]=1;    
-      puerta[1]=puerta[3]=0;    
+      puerta[0]=puerta[2]=1;
+      puerta[1]=puerta[3]=0;
 
       if(nuevo_marcador)
        {
@@ -1375,8 +1706,8 @@ void cargar_hab(void)
       ism_colocar_objeto_rejilla(9,0,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(9,3,0,1000,NULL,NULL);
 
-      puerta[0]=puerta[2]=0;    
-      puerta[1]=puerta[3]=1;    
+      puerta[0]=puerta[2]=0;
+      puerta[1]=puerta[3]=1;
 
       if(nuevo_marcador)
        {
@@ -1406,7 +1737,7 @@ void cargar_hab(void)
      {
       z=(mapa_obj[f] & 0x3f)*ALTURA_BASE;
       f++;
-     }       
+     }
 
     if(mapa_obj[f] <= NOR02) // Cubo estático normal.
      {
@@ -1422,6 +1753,7 @@ void cargar_hab(void)
       movs[num_movs].empujable=0;
       movs[num_movs].anclado=NO_ID;
       movs[num_movs].mover=mov_desaparece;
+      movs[num_movs].tipoObjeto=254;
       num_movs++;
      }
     else if(mapa_obj[f] <= NOR52) // Cubo que mueve los objetos que le caen encima.
@@ -1520,7 +1852,7 @@ void cargar_hab(void)
        }
       px=p+j*4;
       py=(j<3?px+4:p);
- 
+
       ism_colocar_objeto_rejilla(px[0],py[0],0,3*ALTURA_BASE,NULL,NULL);
       ism_colocar_objeto_rejilla(px[2],py[2],0,3*ALTURA_BASE,NULL,NULL);
       ism_colocar_loseta(NULL,px[0],py[0]);
@@ -2482,7 +2814,7 @@ void mov_rbal_l(char f)
        if(movs[f].id==movs[n].anclado)
          ism_cambiar_dato_objeto(movs[n].id,(movs[f].sentmov&1?D_Y:D_X),(movs[f].sentmov>1?1:-1), SUMAR);
       }
-    }  
+    }
   }
 }
 
@@ -2568,7 +2900,7 @@ void mov_rbal_f(char f)
        if(movs[f].id==movs[n].anclado)
          ism_cambiar_dato_objeto(movs[n].id,(movs[f].sentmov&1?D_Y:D_X),(movs[f].sentmov>1?1:-1),SUMAR);
       }
-    }  
+    }
   }
 }
 
@@ -2727,6 +3059,7 @@ void mov_plasma(char f)
  char n,i;
  int dif;
  unsigned char dato;
+ int auxPaco;
 
  // Gravedad.
  if(movs[f].g<1)
@@ -2781,8 +3114,21 @@ void mov_plasma(char f)
        mov_empujar(f,dato,dif);
        i=ism_cambiar_dato_objeto(movs[f].id,dato,dif,SUMAR);
       }
-     else
-       (dato==D_X?movs[f].m0:movs[f].m1)=(dif<0?-1:1);
+     else{
+
+            auxPaco=(dif<0?-1:1);
+
+            if (dato==D_X)
+              movs[f].m0=auxPaco;
+            else
+              movs[f].m1=auxPaco;
+       /////////(dato==D_X?movs[f].m0:movs[f].m1)=(dif<0?-1:1);
+
+
+
+
+     }
+
      if(!i && mover_n)
        for(i=0;i<3;i++)
          if(movs[f].id==movs[i].anclado)
@@ -2805,8 +3151,16 @@ void mov_plasma(char f)
            mov_empujar(f,dato,dif);
            i=ism_cambiar_dato_objeto(movs[f].id,dato,dif,SUMAR);
           }
-         else
-           (dato==D_X?movs[f].m0:movs[f].m1)=dif;
+         else{
+             if (dato==D_X)
+                movs[f].m0=dif;
+            else
+                movs[f].m1=dif;
+           ///(dato==D_X?movs[f].m0:movs[f].m1)=dif;
+
+
+
+         }
          if(!i)
            for(i=1;i<num_movs;i++)
              if(movs[f].id==movs[i].anclado)
@@ -3252,7 +3606,7 @@ void mov_nacho_andar(char f)
    if(movs[0].mover!=mov_nacho_explotar)
     {
      if( (tcj_estado[TCJ_AC0] || tcj_estado[TCJ_AC2]) &&
-        !(tcj_estado[TCJ_IZQ] && movs[0].dir!=2) && 
+        !(tcj_estado[TCJ_IZQ] && movs[0].dir!=2) &&
         !(tcj_estado[TCJ_ABJ] && movs[0].dir!=1) &&
         !(tcj_estado[TCJ_ARR] && movs[0].dir!=3) &&
         !(tcj_estado[TCJ_DER] && movs[0].dir!=0))
@@ -3810,7 +4164,7 @@ char anclar(char f)
    movs[f].anclado=id_a;
    return 0;
   }
- 
+
  // Compruebo cada uno de los objetos con los que he colisionado.
  primer_id=id=(ism_colisionado_con(movs[f].anclado)?movs[f].anclado:ism_extraer_id_blq());
  do
@@ -3892,7 +4246,7 @@ void embolsar(void)
      movs[3].m1=-2; // Ni cojo ni suelto; desplazo los bolsillos.
      if(movs[3].m0>=0 || movs[4].m0>=0 || movs[5].m0>=0) reproducir_sonido(17,PLAYMODE_PLAY);
     }
-   else 
+   else
      if(movs[1].id==NO_ID || movs[2].id==NO_ID) // Hay sitio donde soltar la llave 5.
       {
        if(!ism_cambiar_dato_objeto(movs[0].id,D_Z,ALTURA_BASE,SUMAR))
@@ -3953,10 +4307,13 @@ void ini_partida(void)
 
  h=ph[rand()%4];
 
- if(key[KEY_F1]) h=ph[0];
+ if(key[KEY_F1]) h=ph[0];//Luis Trampa! Como fijar la habitacion inicial
  if(key[KEY_F2]) h=ph[1];
  if(key[KEY_F3]) h=ph[2];
  if(key[KEY_F4]) h=ph[3];
+
+ if (globalLuisHabitacionInicial)
+    h=globalLuisHabitacionInicial;
 
  movs[0].m0=ANCHO_CELDA*5-6;
  movs[0].m1=ANCHO_CELDA*5+7;
@@ -4048,7 +4405,7 @@ void abrir_cerradura(void)
  ism_dibujar_mundo_isom(buffer,x_org,y_org);
  oscuridad=0;
  dibujar_a_luz();
- for(f=0;f<5;f++) fm_volcar(); 
+ for(f=0;f<5;f++) fm_volcar();
 
  ism_establecer_oscuridad(50);
  ism_dibujar_mundo_isom(buffer,x_org,y_org);

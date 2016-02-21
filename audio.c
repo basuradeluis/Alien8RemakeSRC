@@ -11,6 +11,9 @@
 #include <fmod.h>
 #include "audio.h"
 
+
+extern int globalLuisSonidoDesactivado;
+
 //******************************************************************************
 // Declaración de estructuras de datos y variables globales.
 //******************************************************************************
@@ -30,7 +33,7 @@ struct _voz // Estructura para almacenar los datos de las voces
                  // 0-desactivada, 1-normal, 2-bucle, 3-no parar
     int v;       // Voz
    } voz[16]={{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
-              {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}; 
+              {0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
 
 //******************************************************************************
 // Función iniciar_audio()
@@ -38,6 +41,10 @@ struct _voz // Estructura para almacenar los datos de las voces
 //******************************************************************************
 void ini_audio(void)
 {
+
+ if (globalLuisSonidoDesactivado)
+    return;
+
  reserve_voices(16,0);
 
  install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
@@ -55,6 +62,10 @@ void ini_audio(void)
 //******************************************************************************
 void fin_audio(void)
 {
+
+ if (globalLuisSonidoDesactivado)
+    return;
+
  if(musica_sonando>=0) FMOD_Sound_Release(sm);
  FMOD_System_Close(sistema);
  FMOD_System_Release(sistema);
@@ -68,6 +79,11 @@ void fin_audio(void)
 //******************************************************************************
 void reproducir_musica(char n)
 {
+
+ if (globalLuisSonidoDesactivado)
+    return;
+
+
  if(vol_mus)
   {
    FMOD_System_Update(sistema);
@@ -101,6 +117,12 @@ void reproducir_musica(char n)
 //******************************************************************************
 void modificar_volmus(unsigned char vol)
 {
+
+     if (globalLuisSonidoDesactivado)
+    return;
+
+
+
  if(vol<=100)
   {
    vol_mus=vol;
@@ -124,6 +146,11 @@ void modificar_volmus(unsigned char vol)
 //******************************************************************************
 void parar_musica(void)
 {
+ if (globalLuisSonidoDesactivado)
+    return;
+
+
+
  if(musica_sonando>=0)
   {
    FMOD_Sound_Release(sm);
@@ -139,6 +166,11 @@ void parar_musica(void)
 //******************************************************************************
 void musica_fin(void *msc_fin_void, unsigned int long_msc_fin_void)
 {
+
+ if (globalLuisSonidoDesactivado)
+    return;
+
+
  msc_fin=(const char *)msc_fin_void;
  long_msc_fin=long_msc_fin_void;
 }
@@ -149,6 +181,10 @@ void musica_fin(void *msc_fin_void, unsigned int long_msc_fin_void)
 //******************************************************************************
 char reproducir_sonido(char sonido, char bucle)
 {
+ if (globalLuisSonidoDesactivado)
+    return -1;
+
+
  return rep_snd_onda(NULL,sonido,bucle);
 }
 
@@ -158,6 +194,10 @@ char reproducir_sonido(char sonido, char bucle)
 //******************************************************************************
 char reproducir_onda(SAMPLE *onda, char bucle)
 {
+ if (globalLuisSonidoDesactivado)
+   return -1;
+
+
  return rep_snd_onda(onda,0,bucle);
 }
 
@@ -167,8 +207,12 @@ char reproducir_onda(SAMPLE *onda, char bucle)
 //******************************************************************************
 char rep_snd_onda(SAMPLE *onda, char sonido, char modo)
 {
- char f = -1; 
- 
+ char f = -1;
+
+ if (globalLuisSonidoDesactivado)
+    return -1;
+
+
  if(!vol_son) return -1;
 
  do // Busco la primera voz que no se esté usando
@@ -181,7 +225,7 @@ char rep_snd_onda(SAMPLE *onda, char sonido, char modo)
        voz[f].activa = 0;
       }
   }while(voz[f].activa && f<15);
- 
+
  if(voz[f].activa) return -1; // Las 16 voces están siendo usadas.
 
  // Ahora f apunta a la voz que vamos a usar para el sonido.
@@ -194,8 +238,8 @@ char rep_snd_onda(SAMPLE *onda, char sonido, char modo)
    voz[f].activa = 3;
  else
    voz[f].activa = (modo==PLAYMODE_PLAY?1:2);
-  
- return f;  
+
+ return f;
 }
 
 //******************************************************************************
@@ -205,6 +249,9 @@ char rep_snd_onda(SAMPLE *onda, char sonido, char modo)
 void pausar_sonidos(void)
 {
  char f;
+ if (globalLuisSonidoDesactivado)
+    return ;
+
 
  for(f=0;f<16;f++)
    if(voz[f].activa)
@@ -214,7 +261,7 @@ void pausar_sonidos(void)
        deallocate_voice(voz[f].v);
        voz[f].activa = 0;
       }
-     else 
+     else
        voice_stop(voz[f].v);
     }
 }
@@ -226,6 +273,9 @@ void pausar_sonidos(void)
 void reanudar_sonidos(void)
 {
  char f;
+ if (globalLuisSonidoDesactivado)
+    return ;
+
 
  for(f=0;f<16;f++)
    if(voz[f].activa)
@@ -238,6 +288,11 @@ void reanudar_sonidos(void)
 //******************************************************************************
 void reiniciar_sonido(char vz)
 {
+ if (globalLuisSonidoDesactivado)
+    return ;
+
+
+
  if(vz>=0)
  if(voz[vz].activa)
    voice_set_position(voz[vz].v, 0);
@@ -250,6 +305,12 @@ void reiniciar_sonido(char vz)
 void modificar_volson(unsigned char vol, char vz)
 {
  float fvol=vol*2.55;
+
+ if (globalLuisSonidoDesactivado)
+    return ;
+
+
+
  vol_son=(unsigned char)fvol;
  if(vz>=0) voice_set_volume(voz[vz].v, vol_son);
 }
@@ -260,6 +321,11 @@ void modificar_volson(unsigned char vol, char vz)
 //******************************************************************************
 void detener_sonido(char vz)
 {
+
+ if (globalLuisSonidoDesactivado)
+    return ;
+
+
  if(vz>=0)
  if(voz[vz].activa)
   {
@@ -275,6 +341,11 @@ void detener_sonido(char vz)
 void detener_sonidos(char todos)
 {
  char f;
+  if (globalLuisSonidoDesactivado)
+    return ;
+
+
+
  for(f=0;f<16;f++)
    if(voz[f].activa>0 && (voz[f].activa<3 || todos))
     {

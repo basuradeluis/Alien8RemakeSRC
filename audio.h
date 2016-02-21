@@ -4,6 +4,9 @@
 // Por Ignacio Pérez Gil 14/03/2008.
 //******************************************************************************
 
+#include <allegro.h>
+#include <fmod.h>
+
 #ifndef _AUDIOH_
 #define _AUDIOH_
 
