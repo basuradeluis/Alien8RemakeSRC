@@ -62,6 +62,18 @@ int globalLuisJugarDirectamente=0;
      int valor;
 
      puts("Pulse F11 para salida inmediata del juego\n");
+     puts("-nosound: deshabilitar sonido");
+     puts("-nointro: deshabilitar intro");
+     puts("-habitacioninicial N: empezar en la habitacion N");//TODO explicar
+     puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final del juego");
+     puts("-jugar: saltar menu principal");//TODO explicar bien
+
+     puts("F10: disparo (beta)");//TODO explicar bien
+     puts("F9: crear taburete auxiliar(beta)");//TODO explicar bien
+     puts("F1-4 durante arranque: habitacion inicial(5,42,90,113)");//TODO explicar bien
+     puts("F12+ tecla 6: activar trampas");//TODO explicar bien
+     //TODO inmunidad
+     //TODO volar
 
      for (i=0;i<argc;i++){
         if (!(strcasecmp(argv[i],"-nosound"))){

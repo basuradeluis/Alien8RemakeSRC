@@ -328,7 +328,7 @@ char juego(void)
    tcj_comprobar();
    if(key[KEY_6] && key[KEY_F12])
     {
-     trampas=1;
+     trampas=1;//TODO deshabilitar si esta activado
     }
 
 //ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
@@ -346,14 +346,14 @@ char juego(void)
 
    if ((pulsadoF10==0) && (key[KEY_F10])  )  {
         pulsadoF10=1;
-        crearDisparo();
+        crearDisparo();//v2
     }
     if (!key[KEY_F10]){
         pulsadoF10=0;
     }
  if ((pulsadoF9==0) && (key[KEY_F9])  )  {
         pulsadoF9=1;
-        crearTaburete();
+        crearTaburete();//v2
     }
     if (!key[KEY_F9]){
         pulsadoF9=0;
@@ -395,7 +395,7 @@ char juego(void)
 
 
    if(trampas)
-     textout_ex(buffer, font, "*", 10, 10, -1, -1);
+     textout_ex(buffer, font, "*", 10, 10, -1, -1);//TODO deshabilitar si esta activado
    else
     {// Se decrementa y dibuja el contador de años luz
      if(dec_pos_a_luz && dt_partida.cerraduras<24)
@@ -4042,7 +4042,8 @@ void mov_nacho_explotar(char f)
      detener_sonidos(1);
      parar_musica();
      for(f=0;f<60;f++) fm_volcar();
-     if(!trampas) dt_partida.vidas--;
+     if(!trampas)
+        dt_partida.vidas--;
      num_movs=0;
      if(dt_partida.vidas>=0)
       {
