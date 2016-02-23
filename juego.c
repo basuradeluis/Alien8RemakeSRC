@@ -96,7 +96,7 @@ void ini_partida(void);
 #define fm_llave(_T_,_N_)      (BITMAP *)(f_anim[_N_+LLAVE_0+1+_T_*11].dat)
 #define fm_sombra_llave(_T_)   (BITMAP *)(f_anim[_T_*11+LLAVE_0].dat)
 #define fm_nums_al(_T_)        (BITMAP *)(f_anim[_T_+NUMS_AL_0+oscuridad*2].dat)
-#define fm_disparo()            (BITMAP *)(f_anim[138].dat)
+#define fm_disparo()           (BITMAP *)(f_anim[138].dat)
 
 #define DURACION_TABURETE   2999
 // Datos para los objetos con función de movimiento.
@@ -294,7 +294,7 @@ char juego(void)
  puede_saltar=trampas=0;
  dt_anim_nacho.cont=dt_anim_nacho.fot=dt_anim_nacho.tipo=dt_anim_nacho.dirini=0;
 
- int pulsadoF10=0,pulsadoF9=0;
+ int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0;
 
  if(nuevo_marcador)
   {
@@ -326,10 +326,17 @@ char juego(void)
   {
    reproducir_musica(1+(dt_partida.cerraduras&1));
    tcj_comprobar();
-   if(key[KEY_6] && key[KEY_F12])
-    {
-     trampas=1;//TODO deshabilitar si esta activado
-    }
+   if( (pulsadoActivarTrampas==0) &&  (key[KEY_6]) && (key[KEY_F12])   ) {
+     if (trampas)
+        trampas=0;//TODO deshabilitar si esta activado
+     else
+        trampas=1;
+     pulsadoActivarTrampas=1;
+   }
+   if (   !(key[KEY_6]) && !(key[KEY_F12])   ){
+        pulsadoActivarTrampas=0;
+   }
+
 
 //ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
 //MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO, CERRADURAS,LOSETAS Q SE MUEVEN...
@@ -347,17 +354,17 @@ char juego(void)
    if ((pulsadoF10==0) && (key[KEY_F10])  )  {
         pulsadoF10=1;
         crearDisparo();//v2
-    }
-    if (!key[KEY_F10]){
+   }
+   if (!key[KEY_F10]){
         pulsadoF10=0;
-    }
- if ((pulsadoF9==0) && (key[KEY_F9])  )  {
+   }
+   if ((pulsadoF9==0) && (key[KEY_F9])  )  {
         pulsadoF9=1;
         crearTaburete();//v2
-    }
-    if (!key[KEY_F9]){
+   }
+   if (!key[KEY_F9]){
         pulsadoF9=0;
-    }
+   }
 
 
    int color1,color2;
@@ -365,10 +372,10 @@ char juego(void)
    color2= makecol(0,0,0);
 
    sprintf(txtHabitacionActual,"Hab: %d ",h);//Luis
-   textout_ex(buffer, font, txtHabitacionActual, 80, 10, -1, -1);
+   textout_ex(buffer, font, txtHabitacionActual, 85, 10, -1, -1);
 
    sprintf(txtHabitacionActual,"Cerraduras completadas(24): %d ",dt_partida.cerraduras);
-   textout_ex(buffer, font, txtHabitacionActual, 150, 10, -1, -1);
+   textout_ex(buffer, font, txtHabitacionActual, 155, 10, -1, -1);
 
    sprintf(txtHabitacionActual,"                                     ");
    textout_ex(buffer, font, txtHabitacionActual, 400, 30, -1, -1);
@@ -379,10 +386,10 @@ char juego(void)
    ism_obtener_coords_objeto(movs[0].id, &posXNacho, &posYNacho, &posZNacho);
 
 
-   textprintf_ex(buffer, font, 80,  30, color1,color2,"Pos x: %3d",posXNacho);
-   textprintf_ex(buffer, font, 180, 30, color1,color2,"Pos y: %3d",posYNacho);
-   textprintf_ex(buffer, font, 80,  50, color1,color2,"Pos z: %3d",posZNacho);
-   textprintf_ex(buffer, font, 180, 50, color1,color2,"g    : %2d",movs[0].g);
+   textprintf_ex(buffer, font, 100, 30, color1,color2,"Pos x: %3d",posXNacho);
+   textprintf_ex(buffer, font, 190, 30, color1,color2,"Pos y: %3d",posYNacho);
+   textprintf_ex(buffer, font, 100, 50, color1,color2,"Pos z: %3d",posZNacho);
+   textprintf_ex(buffer, font, 190, 50, color1,color2,"g    : %2d",movs[0].g);
 
 
 
@@ -395,9 +402,13 @@ char juego(void)
 
 
    if(trampas)
-     textout_ex(buffer, font, "*", 10, 10, -1, -1);//TODO deshabilitar si esta activado
+      //textout_ex(buffer, font, "TRAMPAS ON", 400,430, -1, -1);//TODO deshabilitar si esta activado
+      textprintf_ex(buffer, font, 100, 70, color1,color2,"TRAMPAS ON   ");
    else
-    {// Se decrementa y dibuja el contador de años luz
+    {
+     //textout_ex(buffer, font, "OK        ",400,430,  -1, -1);//TODO deshabilitar si esta activado
+      textprintf_ex(buffer, font, 100, 70, color1,color2,"             ");
+     // Se decrementa y dibuja el contador de años luz
      if(dec_pos_a_luz && dt_partida.cerraduras<24)
       {
        dec_pos_a_luz=0;
@@ -491,13 +502,12 @@ void crearDisparo(){
 
 
 /*****************************
-problema:dado un id de ojbeto no es facil que tipo es
+Futuro problema:dado un id de ojbeto no es facil saber exactamente que tipo es
 solucion:cambiar CARGARHAB PARA QUE LO ALMACENE
 
 *********************************/
 void moverDisparo(char f){
     //printf("intentan mover el disparo %d",f);
-
 
     unsigned char datoACambiar;//Ejes
     int valor=0;
@@ -4313,7 +4323,7 @@ void ini_partida(void)
  if(key[KEY_F3]) h=ph[2];
  if(key[KEY_F4]) h=ph[3];
 
- if (globalLuisHabitacionInicial)
+ if (globalLuisHabitacionInicial!=-1)
     h=globalLuisHabitacionInicial;
 
  movs[0].m0=ANCHO_CELDA*5-6;

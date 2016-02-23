@@ -4,23 +4,6 @@
 // Por Ignacio Pérez Gil 18/05/2008.
 //******************************************************************************
 
-// Mi madre era una minipime,
-// mi padre era un transistó,
-// y escuchando un disco de Kraftwerk
-// mi padre a mi madre la antena le metió.
-//
-// Le echó dos voltios sin sacarla, la antena,
-// y de allí nasío yo.
-// Y aunque soy una máquina mecánica soy,
-// la vergüensa de tó los robó.
-//
-// Soy un consoladó,
-// soy una máquina de haser el amor,
-// si quieres que te haga felí,
-// llévame muy dentro, muy dentro de ti.
-//
-//                    Soy una máquina de haser el amor - Mojinos Escozíos
-
 //******************************************************************************
 // Includes.
 //******************************************************************************
@@ -52,7 +35,7 @@ void intro(void);
 void luisComprobarParametros(int argc,char **argv);
 int globalLuisSonidoDesactivado=0;
 int globalLuisIntroDesactivada=0;
-int globalLuisHabitacionInicial=0;
+int globalLuisHabitacionInicial=-1;
 int globalLuisMostrarFinalJuego=0;
 int globalLuisJugarDirectamente=0;
 
@@ -64,16 +47,22 @@ int globalLuisJugarDirectamente=0;
      puts("Pulse F11 para salida inmediata del juego\n");
      puts("-nosound: deshabilitar sonido");
      puts("-nointro: deshabilitar intro");
-     puts("-habitacioninicial N: empezar en la habitacion N");//TODO explicar
+     puts("-habitacioninicial N: empezar en la habitacion N (0-128)");
      puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final del juego");
-     puts("-jugar: saltar menu principal");//TODO explicar bien
+     puts("-jugar: saltar menu principal y empezar a jugar directamente");
 
-     puts("F10: disparo (beta)");//TODO explicar bien
+     puts("Pulsa  Av Pag en la pantalla de opciones para activar un marcador alternativo");
      puts("F9: crear taburete auxiliar(beta)");//TODO explicar bien
-     puts("F1-4 durante arranque: habitacion inicial(5,42,90,113)");//TODO explicar bien
-     puts("F12+ tecla 6: activar trampas");//TODO explicar bien
+     puts("F10: disparo (beta)");//TODO explicar bien
+     puts("F1-4 durante arranque: habitacion inicial(5,42,90,113)");
+     puts("F12+ tecla 6: activar trampas (vidas y tiempo infinito)");
+
+     fflush( stdout );
      //TODO inmunidad
      //TODO volar
+     //TODO knightlore usar grafico de otro robot
+     //TODO al pulsar cierta tecla ir a habitacion X
+     //TODO hacer aparecer objeto X
 
      for (i=0;i<argc;i++){
         if (!(strcasecmp(argv[i],"-nosound"))){
@@ -84,6 +73,10 @@ int globalLuisJugarDirectamente=0;
         }
         if (!(strcasecmp(argv[i],"-habitacioninicial"))){
             globalLuisHabitacionInicial=atoi(argv[i+1]);
+            if ( (globalLuisHabitacionInicial<0) || (globalLuisHabitacionInicial>128 /*HAB_REPROGRAMANDO*/) ){
+                printf("Habitacion debe estar entre 0 y 128: %d",globalLuisHabitacionInicial);
+                globalLuisHabitacionInicial=-1;
+            }
             i++;
         }
         if (!(strcasecmp(argv[i],"-mostrarfinal"))){
@@ -104,7 +97,7 @@ int globalLuisJugarDirectamente=0;
 //******************************************************************************
 int main(int argc, const char* argv[] )
 {
- char (*funcion_estado[6])(void)={menu,juego,creditos,opciones,preguntar,redefinir};
+ char (*funcion_estado[6])(void)={menu,juego,creditos,opciones,preguntar,redefinir};//IMPORTANTE, ver juego.h
  char estado=EST_MENU;
 
 
@@ -728,8 +721,8 @@ char opciones(void)
        if(opc>3) reproducir_sonido(23,PLAYMODE_PLAY);
        contador=0;
       }
-     else if(key[KEY_PGDN])
-      {
+     else if(key[KEY_PGDN])//Secreto del cod fuente viejo.
+      {                     //Pulsa  Av Pag en la pantalla de opciones para activar un marcador alternativo
        pulsado=1;
        nuevo_marcador=(nuevo_marcador?0:1);
        textout_ex(buffer,font,nuevo_marcador?"Marcador activado":"Marcador desactivado",10,470,-1,-1);

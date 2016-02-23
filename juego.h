@@ -22,7 +22,7 @@ void fin_juego(void);
 #define EST_CREDITOS  2
 #define EST_OPCIONES  3
 #define EST_PREGUNTAR 4
-#define EST_REDEFINIR 5
+#define EST_REDEFINIR 5 //Ver comienzo de main en alien8.c
 
 #define LETRA_CERR_0  0x80
 #define LETRA_VDAS_0  0x99

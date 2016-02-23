@@ -20,6 +20,7 @@
 					<Add library="e:\Program Files (x86)\CodeBlocks\MinGW\lib\libwininet.a" />
 					<Add library="C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\lib\libfmodex.a" />
 					<Add library="E:\misdoc\alien8\allegro-4.4.2-mingw-4.4.0\lib\liballegro-4.4.2-monolith-mt.a" />
+					<Add directory="C:\Program Files (x86)\FMOD SoundSystem\FMOD Programmers API Windows\api\lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -39,9 +40,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="juego.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="tcj.c">
