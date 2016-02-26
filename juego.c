@@ -3,6 +3,7 @@
 // Funciones del juego.
 // Por Ignacio Pérez Gil 18/05/2008.
 //******************************************************************************
+#include <stdio.h>
 #include <time.h>
 #include <allegro.h>
 #define _JUEGOC_
@@ -155,6 +156,7 @@ char sonido_interferencia;
 char sonido_empujar;
 char sonido_autom;
 char trampas;
+char inmune=0;
 
 void mov_nacho_andar(char f);
 void mov_nacho_saltar(char f);
@@ -294,7 +296,7 @@ char juego(void)
  puede_saltar=trampas=0;
  dt_anim_nacho.cont=dt_anim_nacho.fot=dt_anim_nacho.tipo=dt_anim_nacho.dirini=0;
 
- int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0;
+ int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0, pulsadoActivarInmune=0;
 
  if(nuevo_marcador)
   {
@@ -328,7 +330,7 @@ char juego(void)
    tcj_comprobar();
    if( (pulsadoActivarTrampas==0) &&  (key[KEY_6]) && (key[KEY_F12])   ) {
      if (trampas)
-        trampas=0;//TODO deshabilitar si esta activado
+        trampas=0;
      else
         trampas=1;
      pulsadoActivarTrampas=1;
@@ -336,6 +338,20 @@ char juego(void)
    if (   !(key[KEY_6]) && !(key[KEY_F12])   ){
         pulsadoActivarTrampas=0;
    }
+
+   if( (pulsadoActivarInmune==0) &&  (key[KEY_7]) && (key[KEY_F12])   ) {
+     if (inmune){
+        inmune=0;
+     }
+     else{
+        inmune=1;
+     }
+     pulsadoActivarInmune=1;
+   }
+   if (   !(key[KEY_7]) && !(key[KEY_F12])   ){
+        pulsadoActivarInmune=0;
+   }
+
 
 
 //ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
@@ -393,20 +409,20 @@ char juego(void)
 
 
 
-
-
    if ( key[KEY_F11]){
     salidaInmediata=1;
     terminar=1;
    }
-
-
+    if (inmune)
+        textprintf_ex(buffer, font, 400, 70, color1,color2,"INMUNE ON ");
+    else
+        textprintf_ex(buffer, font, 400, 70, color1,color2,"              ");
    if(trampas)
-      //textout_ex(buffer, font, "TRAMPAS ON", 400,430, -1, -1);//TODO deshabilitar si esta activado
+      //textout_ex(buffer, font, "TRAMPAS ON", 400,430, -1, -1);
       textprintf_ex(buffer, font, 100, 70, color1,color2,"TRAMPAS ON   ");
    else
     {
-     //textout_ex(buffer, font, "OK        ",400,430,  -1, -1);//TODO deshabilitar si esta activado
+     //textout_ex(buffer, font, "OK        ",400,430,  -1, -1);
       textprintf_ex(buffer, font, 100, 70, color1,color2,"             ");
      // Se decrementa y dibuja el contador de años luz
      if(dec_pos_a_luz && dt_partida.cerraduras<24)
@@ -4004,9 +4020,16 @@ void mov_nacho_girar(char f)
 //******************************************************************************
 // Función mov_nacho_explotar(...)
 //    Secuencia de la explosión de Nacho.
+// Luis: parece que es llamada con 1 siempre, tras comprobar colisiones.
+//       Y luego con 0 automaticamente
 //******************************************************************************
 void mov_nacho_explotar(char f)
 {
+ //printf("mov_nacho_explotar(char f) con: %d\n",f);   fflush( stdout );
+ if (inmune){
+     //printf("nacho toco algo mortal pero es inmune\n");   fflush( stdout );
+     return;
+ }
  if(f)
   {
    if(movs[0].mover!=mov_nacho_explotar)

@@ -44,25 +44,30 @@ int globalLuisJugarDirectamente=0;
      int i;
      int valor;
 
-     puts("Pulse F11 para salida inmediata del juego\n");
+
      puts("-nosound: deshabilitar sonido");
      puts("-nointro: deshabilitar intro");
      puts("-habitacioninicial N: empezar en la habitacion N (0-128)");
      puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final del juego");
      puts("-jugar: saltar menu principal y empezar a jugar directamente");
 
-     puts("Pulsa  Av Pag en la pantalla de opciones para activar un marcador alternativo");
+     puts("\nPulsa Av Pag en la pantalla de opciones para activar un marcador alternativo");
      puts("F9: crear taburete auxiliar(beta)");//TODO explicar bien
      puts("F10: disparo (beta)");//TODO explicar bien
-     puts("F1-4 durante arranque: habitacion inicial(5,42,90,113)");
+     puts("F11: para salida inmediata del juego\n");
+     puts("F1-4 durante arranque: habitacion inicial (5,42,90,113)");
      puts("F12+ tecla 6: activar trampas (vidas y tiempo infinito)");
+     puts("F12+ tecla 7: inmune");
 
      fflush( stdout );
      //TODO inmunidad
      //TODO volar
+     //TODO dibujar lineas en el suelo para orientar
      //TODO knightlore usar grafico de otro robot
      //TODO al pulsar cierta tecla ir a habitacion X
      //TODO hacer aparecer objeto X
+     //TODO grabar partida
+     //TODO: camara lenta, o ralentizar algunos objetos (ver habitacion 91, por ejemplo)
 
      for (i=0;i<argc;i++){
         if (!(strcasecmp(argv[i],"-nosound"))){
