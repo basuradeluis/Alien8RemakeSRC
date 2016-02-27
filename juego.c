@@ -101,9 +101,9 @@ void ini_partida(void);
 
 #define DURACION_TABURETE   2999
 // Datos para los objetos con función de movimiento.
-// La posición 0 está reservada para Nacho.
-// Las posiciones 1 y 2 están reservadas para las llaves.
-// Las posiciones 3, 4 y 5 están reservadas para los bolsillos.
+// La posición 0 esta reservada para Nacho.
+// Las posiciones 1 y 2 estan reservadas para las llaves.
+// Las posiciones 3, 4 y 5 estan reservadas para los bolsillos.
 #define MAX_MOVS 40
 char num_movs;
 struct{
@@ -117,7 +117,7 @@ struct{
  char tipoObjeto;
  //LUIS
 } movs[MAX_MOVS];
-char primera_cascara; // Índice de la primera cáscara.
+char primera_cascara; // Índice de la primera cascara.
 char primera_mina_voladora; // Índice de la primera mina voladora.
 
 // Datos varios referentes a la animación de Nacho.
@@ -143,11 +143,11 @@ struct{
 struct{
  ism_id id[5];      // Identificadores de los bloques del joystick.
  ism_id id_t[2];    // Identificadores de los telebots.
- char tc[5];        // Indica que bloques están pisados anteriormente.
- char ta[5];        // Indica que bloques están pisados ahora.
+ char tc[5];        // Indica que bloques estan pisados anteriormente.
+ char ta[5];        // Indica que bloques estan pisados ahora.
 } dt_telebot;
 
-// Datos para los obstáculos
+// Datos para los obstaculos
 #define MAX_OBST 35
 char num_obst;
 ism_id id_obst[MAX_OBST];
@@ -244,7 +244,7 @@ void ini_juego()
      for(n=0;n<3;n++)
       {
        if(n==1)
-         r=g=b=48; // El negro se aclara más que los demás, para que se note mejor.
+         r=g=b=48; // El negro se aclara mas que los demas, para que se note mejor.
        else
         {
          r=getr(colores_al_16[f][n][0]);
@@ -268,7 +268,7 @@ void ini_juego()
      for(n=0;n<3;n++)
       {
        if(n==1)
-         r=g=b=48; // El negro se aclara más que los demás, para que se note mejor.
+         r=g=b=48; // El negro se aclara mas que los demas, para que se note mejor.
        else
         {
          r=getr(colores_al_32[f][n][0]);
@@ -547,7 +547,7 @@ void moverDisparo(char f){
         for (i=0;i<numColisiones;i++){
             ism_id idColisionActual=ism_extraer_id_blq();
             destruir=0;
-            for(j=0;j<num_obst;j++){ // Comprobamos si hemos chocado con un obstáculo:
+            for(j=0;j<num_obst;j++){ // Comprobamos si hemos chocado con un obstaculo:
                 if(id_obst[j]==idColisionActual) {
                     puts("Disparo chocó con un obstaculo\n");
                     //FALTARIA KITARLO DEL ARRAY DE OBSTACULOS O AL MENOS NO MARCARLO?
@@ -1099,7 +1099,7 @@ void detener_nave(void)
  musica_fin(f_fin[8].dat,f_fin[8].size);
  for(f=0;f<TICKS*3;f++) {reproducir_musica(100);fm_volcar();}
 
- // Fundido a blanco a lo bestia de la primera imágen.
+ // Fundido a blanco a lo bestia de la primera imagen.
  buffer2=(BITMAP *)(f_fin[0].dat);
  for(f=0;f<248;f+=8)
   {int x,y,r,g,b,c;
@@ -1166,7 +1166,7 @@ void detener_nave(void)
    fm_volcar();
   }
 
- // Fundido a blanco a lo bestia de la segunda imágen.
+ // Fundido a blanco a lo bestia de la segunda imagen.
  buffer2=(BITMAP *)(f_fin[1].dat);
  for(f=0;f<248;f+=8)
   {int x,y,r,g,b,c;
@@ -1485,9 +1485,9 @@ void cargar_hab(void)
   if(hab[h].banderas&1) // Habitación cuadrada
    {unsigned char puertas=hab[h].x_p & 0x0f;
 
-    if(hab[h].tipo==0) // Hexágonos amarillos.
+    if(hab[h].tipo==0) // Hexagonos amarillos.
      {tipo_blq[0]=2;tipo_blq[1]=1;tipo_blq[2]=4;}
-    else if(hab[h].tipo==1) // Hexágonos azules.
+    else if(hab[h].tipo==1) // Hexagonos azules.
      {tipo_blq[0]=2;tipo_blq[1]=1;tipo_blq[2]=4;}
     else if(hab[h].tipo==2) // Observación.
      {tipo_blq[0]=6;tipo_blq[1]=4;tipo_blq[2]=7;}
@@ -1781,7 +1781,7 @@ void cargar_hab(void)
       f++;
      }
 
-    if(mapa_obj[f] <= NOR02) // Cubo estático normal.
+    if(mapa_obj[f] <= NOR02) // Cubo estatico normal.
      {
       ism_colocar_objeto_rejilla(rx,ry,z,ALTURA_BASE,fm_norm(mapa_obj[f]),(z==ENCIMA?NULL:fm_sombra(0)));
      }
@@ -1902,7 +1902,7 @@ void cargar_hab(void)
       for(j=0;j<4;j++)
         ism_colocar_objeto_rejilla(px[j],py[j],3*ALTURA_BASE,ALTURA_BASE,fm_norm(mapa_obj[f]),fm_sombra(0));
      }
-    else if(mapa_obj[f] <= OBS04) // Obstáculo
+    else if(mapa_obj[f] <= OBS04) // Obstaculo
      {
       if(num_obst>=MAX_OBST) num_obst=MAX_OBST-1;
       id_obst[num_obst]=ism_colocar_objeto_rejilla(rx,ry,z,ALTURA_BASE,fm_obst(mapa_obj[f]),(z==ENCIMA?NULL:fm_sombra((mapa_obj[f]==OBS04?6:0))));
@@ -1931,7 +1931,7 @@ void cargar_hab(void)
       num_movs++;
       num_obst++;
      }
-    else if(mapa_obj[f] <= OBS06) // Cáscara
+    else if(mapa_obj[f] <= OBS06) // Cascara
      {
       if(num_movs>=MAX_MOVS) num_movs=MAX_MOVS-1;
       if(num_obst>=MAX_OBST) num_obst=MAX_OBST-1;
@@ -2094,7 +2094,7 @@ void cargar_hab(void)
       num_movs++;
       num_obst++;
      }
-    else if(mapa_obj[f] == RATAM) // Rata mecánica
+    else if(mapa_obj[f] == RATAM) // Rata mecanica
      {
       if(num_movs>=MAX_MOVS) num_movs=MAX_MOVS-1;
       if(num_obst>=MAX_OBST) num_obst=MAX_OBST-1;
@@ -2372,7 +2372,7 @@ void mov_transportar(char f)
 //******************************************************************************
 void mov_z_pisado(char f)
 {
- if(movs[f].m0) // Está activo.
+ if(movs[f].m0) // Esta activo.
   {
    if(movs[f].id==movs[0].anclado) // Tiene anclado a Nacho.
     {
@@ -2415,14 +2415,14 @@ void mov_z_autom(char f)
 {
  char n,i=-1;
 
- // Si está en el tope máximo empieza a bajar.
+ // Si esta en el tope maximo empieza a bajar.
  if(ism_obtener_dato_objeto(movs[f].id,D_Z)>=movs[f].m1)
   {
    movs[f].g++;
    movs[f].dir=-1;
   }
 
- // Si está subiendo, subo antes los objetos anclados.
+ // Si esta subiendo, subo antes los objetos anclados.
  if(movs[f].dir==1)
   {
    for(n=0;n<num_movs;n++)
@@ -2452,7 +2452,7 @@ void mov_z_autom(char f)
    movs[f].g=0;
   }
 
- // Si está bajando, bajo después los objetos anclados.
+ // Si esta bajando, bajo después los objetos anclados.
  if(movs[f].dir==-1)
   {
    for(n=0;n<num_movs;n++)
@@ -2472,7 +2472,7 @@ void mov_zmn_pisado(char f)
  if(movs[f].id==movs[0].anclado)
   {
    if(movs[f].dir>0)
-    {// Está subiendo.
+    {// Esta subiendo.
      if(!ism_cambiar_dato_objeto(movs[0].id,D_Z,1,SUMAR))
       {
        if(ism_cambiar_dato_objeto(movs[f].id,D_Z,1,SUMAR))
@@ -2482,7 +2482,7 @@ void mov_zmn_pisado(char f)
       }
     }
    else
-    {// Está bajando.
+    {// Esta bajando.
      if(ism_cambiar_dato_objeto(movs[f].id,D_Z,-1,SUMAR))
        movs[f].dir=1;
      else
@@ -2575,7 +2575,7 @@ void mov_desaparece(char f)
 {
  if(movs[f].m0) // Aún no ha desaparecido.
  if(movs[f].id==movs[0].anclado || movs[f].m1>0)
-  { // Está siendo (o ha sido) pisado.
+  { // Esta siendo (o ha sido) pisado.
    if(movs[f].m1<2) reproducir_sonido(1,PLAYMODE_PLAY);
    movs[f].m1+=10;
    if(movs[f].m1<100)
@@ -2604,9 +2604,9 @@ void mov_mina_voladora(char f)
   }
 
  if(movs[f].g<100)
-  {// Está activa.
+  {// Esta activa.
    if(movs[f].g==1)
-    { // Está subiendo.
+    { // Esta subiendo.
      if(ism_cambiar_dato_objeto(movs[f].id,D_Z,1,SUMAR))
       {
        movs[f].g=0;
@@ -2618,7 +2618,7 @@ void mov_mina_voladora(char f)
       }
     }
    else
-    {// Está bajando.
+    {// Esta bajando.
      if(ism_cambiar_dato_objeto(movs[f].id,D_Z,movs[f].g/2-1,SUMAR))
       {
        if(movs[f].g<-1) reproducir_sonido(8+rand()%4,PLAYMODE_PLAY);
@@ -2639,7 +2639,7 @@ void mov_mina_voladora(char f)
 //******************************************************************************
 void mov_mina_terrestre(char f)
 {
- if(movs[f].m0) // La mina está activa.
+ if(movs[f].m0) // La mina esta activa.
   {
    if(movs[f].m1==0)
     {int x,y,z;
@@ -2813,7 +2813,7 @@ void mov_rbal_l(char f)
    else
      movs[f].dir++;
    if(movs[f].m1>1)
-    {// Está parado por haber chocado con algo. Hay que girar el robot.
+    {// Esta parado por haber chocado con algo. Hay que girar el robot.
      if(rand()&1)
       {
        ism_cambiar_mapa_objeto(movs[f].id,fm_robotal(movs[f].sentmov,4));
@@ -2840,7 +2840,7 @@ void mov_rbal_l(char f)
 
  // Se controla el movimiento.
  if(movs[f].m1==0)
-  {// No está parado por haber chocado con algo
+  {// No esta parado por haber chocado con algo
    unsigned char dato;
    int valor;
    if(ism_cambiar_dato_objeto(movs[f].id,dato=(movs[f].sentmov&1?D_Y:D_X),valor=(movs[f].sentmov>1?1:-1), SUMAR))
@@ -2900,7 +2900,7 @@ void mov_rbal_f(char f)
    else
      movs[f].dir++;
    if(movs[f].m1>1)
-    {// Está parado por haber chocado con algo. Hay que girar el robot.
+    {// Esta parado por haber chocado con algo. Hay que girar el robot.
      if(movs[f].m1&1)
       {
        ism_cambiar_mapa_objeto(movs[f].id,fm_robotal(movs[f].sentmov,4));
@@ -2926,7 +2926,7 @@ void mov_rbal_f(char f)
 
  // Se controla el movimiento.
  if(movs[f].m1==0)
-  {// No está parado por haber chocado con algo
+  {// No esta parado por haber chocado con algo
    unsigned char dato;
    int valor;
    if(ism_cambiar_dato_objeto(movs[f].id,dato=(movs[f].sentmov&1?D_Y:D_X),valor=(movs[f].sentmov>1?1:-1),SUMAR))
@@ -2948,7 +2948,7 @@ void mov_rbal_f(char f)
 
 //******************************************************************************
 // Función mov_ratamec(...)
-//    Función de movimiento de la rata mecánica.
+//    Función de movimiento de la rata mecanica.
 //******************************************************************************
 void mov_ratamec(char f)
 {
@@ -3134,7 +3134,7 @@ void mov_plasma(char f)
 
  // Movimiento.
  if(movs[f].id==movs[0].anclado)
-  {// Nacho está encima.
+  {// Nacho esta encima.
    for(n=0,dato=D_X;n<2;n++,dato=D_Y)
     {char mover_n=0;
      dif=ism_obtener_dato_objeto(movs[0].id,dato)-ism_obtener_dato_objeto(movs[f].id,dato);
@@ -3178,7 +3178,7 @@ void mov_plasma(char f)
     }
   }
  else
-  { // Nacho no está encima.
+  { // Nacho no esta encima.
    if(movs[0].id!=NO_ID)
      for(n=0,dato=D_X;n<2;n++)
       {
@@ -3214,12 +3214,12 @@ void mov_plasma(char f)
 
 //******************************************************************************
 // Función mov_cascara(...)
-//    Mueve las cáscaras que caen del techo.
+//    Mueve las cascaras que caen del techo.
 //******************************************************************************
 void mov_cascara(char f)
 {
  if(movs[f].g<=0)
-  {// Está cayendo.
+  {// Esta cayendo.
    if(ism_cambiar_dato_objeto(movs[f].id,D_Z,movs[f].g/2-1,SUMAR))
     {// Ha chocado con algo.
      if(movs[f].g<-1) reproducir_sonido(12,PLAYMODE_PLAY);
@@ -3484,7 +3484,7 @@ void mov_llave(char f)
 void mov_vida(char f)
 {
  if(movs[f].m1)
-  {// Está desapareciendo.
+  {// Esta desapareciendo.
    if(movs[f].sentmov==0)
     {
      char cv[2]={0,0};
@@ -3508,7 +3508,7 @@ void mov_vida(char f)
        ism_mover_pared(SUP_X,2,0,0);
       }
      // Hemos llamado a ism_mover_pared, no para moverla realmente, sino para
-     // incluirla en el rectángulo sucio del siguiente fotograma.
+     // incluirla en el rectangulo sucio del siguiente fotograma.
      reproducir_sonido(22,PLAYMODE_PLAY);
     }
    if((movs[f].sentmov+=15)>=100)
@@ -3605,7 +3605,7 @@ void mov_empujable(char f)
 
 //******************************************************************************
 // Función mov_astronauta(...)
-//    Función de animación de las cápsulas criogénicas.
+//    Función de animación de las capsulas criogénicas.
 //******************************************************************************
 void mov_astronauta(char f)
 {
@@ -3623,7 +3623,7 @@ void mov_astronauta(char f)
 
 //******************************************************************************
 // Función mov_nacho_andar(...)
-//    Mueve a Nacho cuando está andando.
+//    Mueve a Nacho cuando esta andando.
 
 //Tambien entra en esta funcion aunque no ande, si intento sumar directamente z++
 //******************************************************************************
@@ -3832,7 +3832,7 @@ void mov_nacho_andar(char f)
 
 //******************************************************************************
 // Función mov_nacho_saltar(...)
-//    Mueve a Nacho cuando está saltando.
+//    Mueve a Nacho cuando esta saltando.
 //******************************************************************************
 void mov_nacho_saltar(char f)
 {
@@ -3860,7 +3860,7 @@ void mov_nacho_saltar(char f)
            f=MAX_MOVS+1;
           }
        if(f<=MAX_MOVS)
-         for(f=0;f<num_obst;f++) // Comprobamos si hemos chocado con un obstáculo.
+         for(f=0;f<num_obst;f++) // Comprobamos si hemos chocado con un obstaculo.
            if(id_obst[f]==id) mov_nacho_explotar(1);
       }
      movs[0].g=0;
@@ -3938,7 +3938,7 @@ void mov_nacho_saltar(char f)
 
 //******************************************************************************
 // Función mov_nacho_fotograma(...)
-//    Cambia el fotograma de Nacho si está andando o saltando.
+//    Cambia el fotograma de Nacho si esta andando o saltando.
 //******************************************************************************
 void mov_nacho_fotograma(void)
 {
@@ -3955,7 +3955,7 @@ void mov_nacho_fotograma(void)
 
 //******************************************************************************
 // Función mov_nacho_girar(...)
-//    Mueve a Nacho cuando está girando.
+//    Mueve a Nacho cuando esta girando.
 //******************************************************************************
 void mov_nacho_girar(char f)
 {
@@ -4180,7 +4180,7 @@ void mov_empujar(char i, unsigned char dato, int valor)
   }
  else if(i==0)
   {// El que empuja es Nacho. Compruebo si todos los objetos con los que ha
-   // colisionado son obstáculos.
+   // colisionado son obstaculos.
    for(f=n=0;f<num_obst;f++)
      if(ism_colisionado_con(id_obst[f]))
        n++;
@@ -4190,14 +4190,14 @@ void mov_empujar(char i, unsigned char dato, int valor)
 
 //******************************************************************************
 // Función anclar(...)
-//    Ancla el objeto indicado. Devuelve 1 si se ancla a un obstáculo.
+//    Ancla el objeto indicado. Devuelve 1 si se ancla a un obstaculo.
 //******************************************************************************
 char anclar(char f)
 {
  char n,encontrado=0;
  ism_id id, primer_id=NO_ID, id_a=NO_ID;
 
- // Busco si hay más de un mov_z_autom. Si los hay, anclo con el primero que
+ // Busco si hay mas de un mov_z_autom. Si los hay, anclo con el primero que
  // vaya hacia arriba, o con el último si todos van hacia abajo.
  for(n=6;n<num_movs;n++)
   {
@@ -4240,12 +4240,12 @@ char anclar(char f)
          else if(movs[n].mover==mov_cascara || movs[n].mover==mov_rbal_l  ||
                  movs[n].mover==mov_rbal_f  || movs[n].mover==mov_ratamec ||
                  movs[n].mover==mov_saturno || movs[n].mover==mov_mina_voladora)
-           return 1; // Si anclo a Nacho con unobstáculo móvil, lo mato.
+           return 1; // Si anclo a Nacho con unobstaculo móvil, lo mato.
         }
        return 0;
       }
 
-   // Si aún no he encontrado ningún desconocido, busco entre los obstáculos.
+   // Si aún no he encontrado ningún desconocido, busco entre los obstaculos.
    if(id_a==NO_ID)
     {
      for(n=0;!encontrado && n<num_obst;n++)
@@ -4258,7 +4258,7 @@ char anclar(char f)
      id=ism_extraer_id_blq();
   }while(id!=NO_ID);
 
- // Únicamente he encontrado obstáculos.
+ // Únicamente he encontrado obstaculos.
  if(id_a==NO_ID)
   {
    movs[f].anclado=primer_id;
@@ -4409,7 +4409,7 @@ void ini_partida(void)
 
 //******************************************************************************
 // Función abrir_cerradura()
-//    Secuencia de activación de las cámaras criogénicas.
+//    Secuencia de activación de las camaras criogénicas.
 //******************************************************************************
 void abrir_cerradura(void)
 {

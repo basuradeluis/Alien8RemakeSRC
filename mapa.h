@@ -222,9 +222,9 @@ struct{
 #define PTYS1 31
 #define PTYS2 32
 // Objeto normal bajo puerta elevada xi
-#define PTXI0 33
-#define PTXI1 34
-#define PTXI2 35
+#define PTXI0 33 //Cuadrado morado bajo puerta elevada
+#define PTXI1 34 //Cuadrado azuul oscuro bajo puerta elevada
+#define PTXI2 35 //Cuadrado rosa bajo puerta elevada
 // Objeto normal bajo puerta elevada yi
 #define PTYI0 36
 #define PTYI1 37
@@ -790,6 +790,14 @@ COL61, NOR01, ELEV4, NOR12, NOR12, COL02, ROBS2, COL03, ROBS2, COL04, ROBS1,
 COL05, ROBS1, COL06, ROBS0, COL07, ROBS0, COL23, ROBS3, COL33, ROBS4, COL43, ROBS4,
 COL46, NOR03, COL47, NOR03, COL36, NOR03, COL37, NOR03, NOR03
 };
+/***
+v2: Estructura anterior de las habitaciones: Primero va un COL00 indicando posicion x  e y dentro de la habitacion
+(0,0 es arriba del todo; 7,0 es esquina derecha del todo, 7,7 seria abajo del todo
+Despues va el tipo de elemento (normal00, por ej)
+Si hay varios elementos sin cambiar de columnas, se van superponiendo.
+Si hay un elev, en la ultima X-Y se coloca elevado ese objeto
+Un buen ejemplo es la hab 128 o la 79
+**/
 
 //******************************************************************************
 // Estructura para las llaves.

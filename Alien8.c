@@ -60,7 +60,7 @@ int globalLuisJugarDirectamente=0;
      puts("F12+ tecla 7: inmune");
 
      fflush( stdout );
-     //TODO mejorar carteles de mensajes, kitar sobrante, mejorar g
+
      //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi
      //TODO volar
      //TODO dibujar lineas en el suelo para orientar
@@ -71,6 +71,7 @@ int globalLuisJugarDirectamente=0;
      //TODO: camara lenta, o ralentizar algunos objetos (ver habitacion 91, por ejemplo)
 
      //TODO investigar habitacion 79 los bloques se comportan asi? y la 105 era asi?
+     //TODO extraer img
 
      for (i=0;i<argc;i++){
         if (!(strcasecmp(argv[i],"-nosound"))){
