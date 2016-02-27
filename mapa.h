@@ -9,7 +9,7 @@
 //******************************************************************************
 #define NUM_HABS 129
 struct{
- unsigned short n;        // Número de objetos en la habitación
+ unsigned short n;        // Número de objetos en la habitación. V2: se sobreescribe luego por offset del ultimo objeto
 
  unsigned char x_p;       // Los cuatro bits más significativos indican la coordenada
                           // x de la habitación. Los otros, la configuración de las puertas.

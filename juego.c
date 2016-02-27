@@ -216,8 +216,9 @@ void ini_juego()
  unsigned char f,n;
  int r,g,b;
 
- for(f=1;f<NUM_HABS;f++)
-   hab[f].n+=hab[f-1].n;
+ for(f=1;f<NUM_HABS;f++)        //v2:IMPORTANTE: se sustituye para cada habitacion su "numero de objetos que contiene" por
+   hab[f].n+=hab[f-1].n;        //el "offset" del ultimo objeto. Ver cargar_habitacion
+
  buffer=create_bitmap(RES_X,RES_Y);
  mapa_al=create_sub_bitmap(buffer,A_LUZ_X_N,A_LUZ_Y_N,46,18);
  f_obj=load_datafile("objetos.dat");
@@ -329,10 +330,7 @@ char juego(void)
    reproducir_musica(1+(dt_partida.cerraduras&1));
    tcj_comprobar();
    if( (pulsadoActivarTrampas==0) &&  (key[KEY_6]) && (key[KEY_F12])   ) {
-     if (trampas)
-        trampas=0;
-     else
-        trampas=1;
+     trampas=(trampas+1)%2;
      pulsadoActivarTrampas=1;
    }
    if (   !(key[KEY_6]) && !(key[KEY_F12])   ){
@@ -340,12 +338,7 @@ char juego(void)
    }
 
    if( (pulsadoActivarInmune==0) &&  (key[KEY_7]) && (key[KEY_F12])   ) {
-     if (inmune){
-        inmune=0;
-     }
-     else{
-        inmune=1;
-     }
+     inmune=(inmune+1)%2;
      pulsadoActivarInmune=1;
    }
    if (   !(key[KEY_7]) && !(key[KEY_F12])   ){
@@ -359,7 +352,6 @@ char juego(void)
    for(f=0;f<num_movs;f++){
        if (movs[f].mover!=NULL)
             movs[f].mover(f);
-
    }
 
    if(sonido_empujar)
@@ -374,6 +366,7 @@ char juego(void)
    if (!key[KEY_F10]){
         pulsadoF10=0;
    }
+
    if ((pulsadoF9==0) && (key[KEY_F9])  )  {
         pulsadoF9=1;
         crearTaburete();//v2
@@ -404,8 +397,8 @@ char juego(void)
 
    textprintf_ex(buffer, font, 100, 30, color1,color2,"Pos x: %3d",posXNacho);
    textprintf_ex(buffer, font, 190, 30, color1,color2,"Pos y: %3d",posYNacho);
-   textprintf_ex(buffer, font, 100, 50, color1,color2,"Pos z: %3d",posZNacho);
-   textprintf_ex(buffer, font, 190, 50, color1,color2,"g    : %2d",movs[0].g);
+   textprintf_ex(buffer, font, 100, 45, color1,color2,"Pos z: %3d",posZNacho);
+   textprintf_ex(buffer, font, 190, 45, color1,color2,"g: %3d",movs[0].g);
 
 
 
@@ -414,16 +407,16 @@ char juego(void)
     terminar=1;
    }
     if (inmune)
-        textprintf_ex(buffer, font, 400, 70, color1,color2,"INMUNE ON ");
+        textprintf_ex(buffer, font, 450, 60, color1,color2,"INMUNE ON ");
     else
-        textprintf_ex(buffer, font, 400, 70, color1,color2,"              ");
+        textprintf_ex(buffer, font, 450, 60, color1,color2,"           ");
    if(trampas)
       //textout_ex(buffer, font, "TRAMPAS ON", 400,430, -1, -1);
-      textprintf_ex(buffer, font, 100, 70, color1,color2,"TRAMPAS ON   ");
+      textprintf_ex(buffer, font, 100, 60, color1,color2,"TRAMPAS ON ");
    else
     {
      //textout_ex(buffer, font, "OK        ",400,430,  -1, -1);
-      textprintf_ex(buffer, font, 100, 70, color1,color2,"             ");
+      textprintf_ex(buffer, font, 100, 60, color1,color2,"            ");
      // Se decrementa y dibuja el contador de años luz
      if(dec_pos_a_luz && dt_partida.cerraduras<24)
       {
@@ -861,7 +854,7 @@ void dibujar_a_luz(void)
 //******************************************************************************
 void reprogramar(void)
 {
- int f,x,y;
+ int f,x,y, transp;
  BITMAP *buffer2=create_bitmap(RES_X,RES_Y);
  BITMAP *txt_rep=create_bitmap(384,48);
 
@@ -1023,7 +1016,7 @@ void reprogramar(void)
   }
  detener_sonidos(1);
 
-// Cáe al suelo
+// Cae al suelo
  if(!tcj_estado[TCJ_AC3])
  for(f=0;f>-10 && !tcj_estado[TCJ_AC3];f--)
   {
@@ -1031,8 +1024,28 @@ void reprogramar(void)
    ism_dibujar_mundo_isom(buffer,x_org,y_org);
    fm_volcar();
    tcj_comprobar();
-   if(f==-9) reproducir_sonido(14,PLAYMODE_PLAY);
+   if(f==-9)    reproducir_sonido(14,PLAYMODE_PLAY);
+
   }
+
+     //v2 transparencia nacho
+  for (transp=0;transp<99;transp=transp+5){ //v2:le hacemos transparente
+        ism_cambiar_dato_objeto(movs[0].id,D_TRANSP,transp, CAMBIAR);
+        ism_dibujar_mundo_isom(buffer,x_org,y_org);
+        fm_volcar();
+        fm_pausa(5);
+  }
+  //v2
+
+     //oscurecer la pantalla
+     for (transp=0;transp<95;transp=transp+5){
+        //printf("Oscurecer: %d",
+        ism_establecer_oscuridad(transp);
+        ism_dibujar_mundo_isom(buffer,x_org,y_org);
+        fm_volcar();
+        fm_pausa(7);
+     }
+
 
  if(!tcj_estado[TCJ_AC3])
  do
@@ -1043,6 +1056,7 @@ void reprogramar(void)
    reproducir_musica(0);
   }while(!tcj_estado[TCJ_AC0] && !tcj_estado[TCJ_AC1] && !tcj_estado[TCJ_AC2] &&
          !tcj_estado[TCJ_AC3] && !tcj_estado[TCJ_AC4]);
+
  detener_sonidos(1);
  destroy_bitmap(buffer2);
  destroy_bitmap(txt_rep);
@@ -1466,6 +1480,7 @@ void cargar_hab(void)
   for(f=0;f<5;dt_telebot.ta[f++]=0);
   for(f=0;f<8;id_jamba[f++]=NO_ID);
 
+  printf("Habitacion %d",h);fflush(NULL);
 // Se definen las dimensiones de la habitación, y se colocan las paredes y el suelo.
   if(hab[h].banderas&1) // Habitación cuadrada
    {unsigned char puertas=hab[h].x_p & 0x0f;
@@ -1745,13 +1760,14 @@ void cargar_hab(void)
      }
    }
 
-// Se colocan los objetos.
+// Se colocan los objetos
   primera_cascara=primera_mina_voladora=-1;
   num_obst=0;
   num_movs=6;
   rx=dx; ry=dy;
-  for(f=(h?hab[h-1].n:0);f<hab[h].n;f++)
+  for(f=(h?hab[h-1].n:0);f<hab[h].n;f++)    //v2:Importante: ver comienzo de ini_juego. Offset objeto inicial y offset del obj final
    {int z=ENCIMA;
+    printf("Objeto %d\n",f);fflush(NULL);
     if(mapa_obj[f]>=COL00) // Cambio x/y
      {
       rx = (mapa_obj[f] & 0x07) + dx;
@@ -3608,6 +3624,8 @@ void mov_astronauta(char f)
 //******************************************************************************
 // Función mov_nacho_andar(...)
 //    Mueve a Nacho cuando está andando.
+
+//Tambien entra en esta funcion aunque no ande, si intento sumar directamente z++
 //******************************************************************************
 void mov_nacho_andar(char f)
 {
@@ -3627,7 +3645,8 @@ void mov_nacho_andar(char f)
      movs[0].g=0;
     }
 
-   if(anclar(0)) mov_nacho_explotar(1);
+   if(anclar(0))
+            mov_nacho_explotar(1);
 
    if(movs[0].mover!=mov_nacho_explotar)
     {
@@ -4074,7 +4093,8 @@ void mov_nacho_explotar(char f)
     {
      detener_sonidos(1);
      parar_musica();
-     for(f=0;f<60;f++) fm_volcar();
+     for(f=0;f<60;f++)
+        fm_volcar();
      if(!trampas)
         dt_partida.vidas--;
      num_movs=0;
@@ -4307,7 +4327,7 @@ void embolsar(void)
 void ini_partida(void)
 {
  unsigned char f,n,i;
- char ph[4]={5,42,90,113};
+ char ph[4]={5,42,90,113}; //v2 habitaciones iniciales
  char ntipo=(char)(rand()%4);
  char cv[2]={0,0};
 
@@ -4339,7 +4359,7 @@ void ini_partida(void)
    textout_ex(mapa_vidas, (FONT *)(f_fuentes[0].dat), cv, 0, 0, -1, -1);
   }
 
- h=ph[rand()%4];
+ h=ph[rand()%4];    //HABITACION INICIAL
 
  if(key[KEY_F1]) h=ph[0];//Luis Trampa! Como fijar la habitacion inicial
  if(key[KEY_F2]) h=ph[1];
