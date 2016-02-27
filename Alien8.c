@@ -60,7 +60,7 @@ int globalLuisJugarDirectamente=0;
      puts("F12+ tecla 7: inmune");
 
      fflush( stdout );
-
+    //todo QUITAR WARNINGS DEL ARRAY
      //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi
      //TODO volar
      //TODO dibujar lineas en el suelo para orientar

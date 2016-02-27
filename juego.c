@@ -356,7 +356,47 @@ char juego(void)
 
    if(sonido_empujar)
         sonido_empujar--;
+
+
    ism_dibujar_mundo_isom(buffer,x_org,y_org);
+   //ABurda verda line(buffer, 50,50, 150, 50,makecol(0,255,0));//v2
+
+   int ceroX,ceroY,auxLineas;
+   ism_coords_iso_a_2d(0,0,0, &ceroX, &ceroY);
+   int v22_x,v22_y;
+   ism_coords_iso_a_2d(ANCHO_CELDA,ANCHO_CELDA,0, &v22_x, &v22_y);
+   line(buffer, ceroX,ceroY, 250, 150,makecol(255,255,0));//v2 //AMARILLA Desde un punto absoluto absurdo hasta el 0,0 de la hab ??
+
+   line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2 //Desde el 0,0 hasta el 1,1
+
+   int numColX=0,numColY=0;
+   if (hab[h].banderas&1){//Cuadrada (ver cargar_hab):
+        numColX=10;
+        numColY=10;
+   }
+   else{
+     if((hab[h].x_p & 0x0f)==5){ // Pasillo en y
+        numColX=4;
+        numColY=10;
+     }
+     else{  //Pasillo en x
+        numColX=10;
+        numColY=4;
+     }
+   }
+   for (auxLineas=0;auxLineas<=numColX;auxLineas++){
+        ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,0,0, &ceroX, &ceroY);
+        ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,numColY*ANCHO_CELDA,0, &v22_x, &v22_y);
+
+        line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2//AZUL, paralelas al eje y
+   }
+
+   for (auxLineas=0;auxLineas<=numColY;auxLineas++){
+        ism_coords_iso_a_2d(0,              auxLineas*ANCHO_CELDA,0, &ceroX, &ceroY);
+        ism_coords_iso_a_2d(numColX*ANCHO_CELDA,  auxLineas*ANCHO_CELDA,0, &v22_x, &v22_y);
+
+        line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(255,0,0));//v2 //ROJO, paralelas al eje x
+   }
 
 
    if ((pulsadoF10==0) && (key[KEY_F10])  )  {
@@ -1480,7 +1520,7 @@ void cargar_hab(void)
   for(f=0;f<5;dt_telebot.ta[f++]=0);
   for(f=0;f<8;id_jamba[f++]=NO_ID);
 
-  printf("Habitacion %d",h);fflush(NULL);
+  //printf("Habitacion %d",h);fflush(NULL);
 // Se definen las dimensiones de la habitación, y se colocan las paredes y el suelo.
   if(hab[h].banderas&1) // Habitación cuadrada
    {unsigned char puertas=hab[h].x_p & 0x0f;
@@ -1637,6 +1677,12 @@ void cargar_hab(void)
     if((hab[h].x_p & 0x0f)==5) // Pasillo en y
      {
       ism_establecer_rejilla(4,10,ANCHO_CELDA);
+
+
+      fputs("ASDF1",stdout);fflush(NULL);
+      line(buffer, 12,3, 80, 100, makecol(255,255,0));//v2
+        fputs("ASDF2",stdout);fflush(NULL);
+
       oscuridad=0;
       dx=0;dy=1;
       x_org=X_ORG+ANCHO_CELDA*3*2;
@@ -1648,6 +1694,11 @@ void cargar_hab(void)
       ism_mover_pared(SUP_Y,0,145,0);
       ism_colocar_pared(fm_escenario_pasillo(2),SUP_X,0);
       ism_mover_pared(SUP_X,0,-18,-90);
+
+      fputs("\nASDF3",stdout);fflush(NULL);
+      line(buffer, 50,50, 150, 50,makecol(255,255,0));//v2
+      line(buffer, 50,50, 140, 50,makecol(255,0,0));//v2
+      fputs("ASDF4",stdout);fflush(NULL);
 
       if(nuevo_marcador)
        {
@@ -1699,6 +1750,11 @@ void cargar_hab(void)
     else // Pasillo en x
      {
       ism_establecer_rejilla(10,4,ANCHO_CELDA);
+
+      fputs("ASDF",stdout);fflush(NULL);
+      line(buffer, 12,3, 80, 100,4);//v2
+        fputs("ASDF2",stdout);fflush(NULL);
+
       oscuridad=0;
       dx=1;dy=0;
       x_org=X_ORG-ANCHO_CELDA*3*2;
@@ -1767,7 +1823,7 @@ void cargar_hab(void)
   rx=dx; ry=dy;
   for(f=(h?hab[h-1].n:0);f<hab[h].n;f++)    //v2:Importante: ver comienzo de ini_juego. Offset objeto inicial y offset del obj final
    {int z=ENCIMA;
-    printf("Objeto %d\n",f);fflush(NULL);
+    //printf("Objeto %d\n",f);fflush(NULL);
     if(mapa_obj[f]>=COL00) // Cambio x/y
      {
       rx = (mapa_obj[f] & 0x07) + dx;
