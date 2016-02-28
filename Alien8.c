@@ -51,19 +51,21 @@ int globalLuisJugarDirectamente=0;
      puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final del juego");
      puts("-jugar: saltar menu principal y empezar a jugar directamente");
 
-     puts("\nPulsa Av Pag en la pantalla de opciones para activar un marcador alternativo");
-     puts("F9: crear taburete auxiliar(beta)");//TODO explicar bien
+     puts("\nF1-4 al empezar partida: habitacion inicial (5,42,90,113)");
+     puts("Pulsa Av Pag en la pantalla de opciones para activar un marcador alternativo");
+
+     puts("\nF9: crear taburete auxiliar(beta)");//TODO explicar bien
      puts("F10: disparo (beta)");//TODO explicar bien
      puts("F11: para salida inmediata del juego\n");
-     puts("F1-4 durante arranque: habitacion inicial (5,42,90,113)");
-     puts("F12+ tecla 6: activar trampas (vidas y tiempo infinito)");
-     puts("F12+ tecla 7: inmune");
+     puts("F12 + tecla 6: activar trampas (vidas y tiempo infinito)");
+     puts("F12 + tecla 7: inmune");
+     puts("F12 + tecla 8: dibujar lineas suelo");
 
      fflush( stdout );
-    //todo QUITAR WARNINGS DEL ARRAY
-     //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi
+
+     //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi.-> La puerta es dificil
      //TODO volar
-     //TODO dibujar lineas en el suelo para orientar
+
      //TODO knightlore usar grafico de otro robot
      //TODO al pulsar cierta tecla ir a habitacion X
      //TODO hacer aparecer objeto X

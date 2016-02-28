@@ -297,6 +297,7 @@ char juego(void)
  puede_saltar=trampas=0;
  dt_anim_nacho.cont=dt_anim_nacho.fot=dt_anim_nacho.tipo=dt_anim_nacho.dirini=0;
 
+ int dibujarLineas=0, pulsadoDibujarLineas=0;
  int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0, pulsadoActivarInmune=0;
 
  if(nuevo_marcador)
@@ -325,7 +326,7 @@ char juego(void)
  cargar_hab();
 
  reproducir_sonido(30,-1);
- do
+ do         /*********************** Bucle ppal ************************/
   {
    reproducir_musica(1+(dt_partida.cerraduras&1));
    tcj_comprobar();
@@ -346,56 +347,70 @@ char juego(void)
    }
 
 
-
-//ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
-//MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO, CERRADURAS,LOSETAS Q SE MUEVEN...
+   /***********************************************************************************/
+   //ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
+   //MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO, CERRADURAS,LOSETAS Q SE MUEVEN...
    for(f=0;f<num_movs;f++){
        if (movs[f].mover!=NULL)
             movs[f].mover(f);
    }
+   /***********************************************************************************/
 
    if(sonido_empujar)
         sonido_empujar--;
 
 
    ism_dibujar_mundo_isom(buffer,x_org,y_org);
-   //ABurda verda line(buffer, 50,50, 150, 50,makecol(0,255,0));//v2
 
    int ceroX,ceroY,auxLineas;
-   ism_coords_iso_a_2d(0,0,0, &ceroX, &ceroY);
    int v22_x,v22_y;
-   ism_coords_iso_a_2d(ANCHO_CELDA,ANCHO_CELDA,0, &v22_x, &v22_y);
-   line(buffer, ceroX,ceroY, 250, 150,makecol(255,255,0));//v2 //AMARILLA Desde un punto absoluto absurdo hasta el 0,0 de la hab ??
 
-   line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2 //Desde el 0,0 hasta el 1,1
+   //line(buffer, ceroX,ceroY, 250, 150,makecol(255,255,0));//v2 //AMARILLA Desde un punto absoluto absurdo hasta el 0,0 de la hab ??
+   //line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2 //Desde el 0,0 hasta el 1,1
 
    int numColX=0,numColY=0;
-   if (hab[h].banderas&1){//Cuadrada (ver cargar_hab):
+
+   if( (pulsadoDibujarLineas==0) &&  (key[KEY_8]) && (key[KEY_F12])   ) {
+     dibujarLineas=(dibujarLineas+1)%2;
+     pulsadoDibujarLineas=1;
+   }
+   if (   !(key[KEY_8]) && !(key[KEY_F12])   ){
+        pulsadoDibujarLineas=0;
+   }
+
+   if (dibujarLineas){//v2: dibujar lineas orientativas
+       if (hab[h].banderas&1){//Cuadrada (ver cargar_hab):
         numColX=10;
         numColY=10;
-   }
-   else{
-     if((hab[h].x_p & 0x0f)==5){ // Pasillo en y
-        numColX=4;
-        numColY=10;
-     }
-     else{  //Pasillo en x
-        numColX=10;
-        numColY=4;
-     }
-   }
-   for (auxLineas=0;auxLineas<=numColX;auxLineas++){
-        ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,0,0, &ceroX, &ceroY);
-        ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,numColY*ANCHO_CELDA,0, &v22_x, &v22_y);
+       }
+       else{
+         if((hab[h].x_p & 0x0f)==5){ // Pasillo en y
+            numColX=4;
+            numColY=10;
+         }
+         else{  //Pasillo en x
+            numColX=10;
+            numColY=4;
+         }
+       }
+       //z vertical:
+       ism_coords_iso_a_2d(0,0,ALTURA_BASE*3, &v22_x, &v22_y);
+       ism_coords_iso_a_2d(0,0,0, &ceroX, &ceroY);
+       line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,255,0));//v2//VERDE z
 
-        line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2//AZUL, paralelas al eje y
-   }
+       for (auxLineas=0;auxLineas<=numColX;auxLineas++){
+            ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,0,0, &ceroX, &ceroY);
+            ism_coords_iso_a_2d(auxLineas*ANCHO_CELDA,numColY*ANCHO_CELDA,0, &v22_x, &v22_y);
 
-   for (auxLineas=0;auxLineas<=numColY;auxLineas++){
-        ism_coords_iso_a_2d(0,              auxLineas*ANCHO_CELDA,0, &ceroX, &ceroY);
-        ism_coords_iso_a_2d(numColX*ANCHO_CELDA,  auxLineas*ANCHO_CELDA,0, &v22_x, &v22_y);
+            line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(0,0,255));//v2//AZUL, paralelas al eje y
+       }
 
-        line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(255,0,0));//v2 //ROJO, paralelas al eje x
+       for (auxLineas=0;auxLineas<=numColY;auxLineas++){
+            ism_coords_iso_a_2d(0,              auxLineas*ANCHO_CELDA,0, &ceroX, &ceroY);
+            ism_coords_iso_a_2d(numColX*ANCHO_CELDA,  auxLineas*ANCHO_CELDA,0, &v22_x, &v22_y);
+
+            line(buffer, ceroX,ceroY, v22_x, v22_y,makecol(255,0,0));//v2 //ROJO, paralelas al eje x
+       }
    }
 
 
@@ -446,10 +461,14 @@ char juego(void)
     salidaInmediata=1;
     terminar=1;
    }
-    if (inmune)
+   if (inmune){
         textprintf_ex(buffer, font, 450, 60, color1,color2,"INMUNE ON ");
-    else
+        ism_cambiar_dato_objeto(movs[0].id,D_TRANSP,30, CAMBIAR);
+   }
+   else{
         textprintf_ex(buffer, font, 450, 60, color1,color2,"           ");
+        ism_cambiar_dato_objeto(movs[0].id,D_TRANSP,0, CAMBIAR);
+   }
    if(trampas)
       //textout_ex(buffer, font, "TRAMPAS ON", 400,430, -1, -1);
       textprintf_ex(buffer, font, 100, 60, color1,color2,"TRAMPAS ON ");
@@ -589,7 +608,7 @@ void moverDisparo(char f){
             destruir=0;
             for(j=0;j<num_obst;j++){ // Comprobamos si hemos chocado con un obstaculo:
                 if(id_obst[j]==idColisionActual) {
-                    puts("Disparo chocó con un obstaculo\n");
+                    puts("Disparo choco con un obstaculo\n");
                     //FALTARIA KITARLO DEL ARRAY DE OBSTACULOS O AL MENOS NO MARCARLO?
                     destruir=1;
                 }
@@ -597,7 +616,7 @@ void moverDisparo(char f){
             for (k=0;k<num_movs;k++){
                 if (movs[k].id==idColisionActual){
                     movs[k].mover=NULL;
-                    puts("Disparo chocó con un obj movible\n");
+                    puts("Disparo choco con un obj movible\n");
                     destruir=1;
                 }
             }
@@ -1679,10 +1698,6 @@ void cargar_hab(void)
       ism_establecer_rejilla(4,10,ANCHO_CELDA);
 
 
-      fputs("ASDF1",stdout);fflush(NULL);
-      line(buffer, 12,3, 80, 100, makecol(255,255,0));//v2
-        fputs("ASDF2",stdout);fflush(NULL);
-
       oscuridad=0;
       dx=0;dy=1;
       x_org=X_ORG+ANCHO_CELDA*3*2;
@@ -1694,11 +1709,6 @@ void cargar_hab(void)
       ism_mover_pared(SUP_Y,0,145,0);
       ism_colocar_pared(fm_escenario_pasillo(2),SUP_X,0);
       ism_mover_pared(SUP_X,0,-18,-90);
-
-      fputs("\nASDF3",stdout);fflush(NULL);
-      line(buffer, 50,50, 150, 50,makecol(255,255,0));//v2
-      line(buffer, 50,50, 140, 50,makecol(255,0,0));//v2
-      fputs("ASDF4",stdout);fflush(NULL);
 
       if(nuevo_marcador)
        {
