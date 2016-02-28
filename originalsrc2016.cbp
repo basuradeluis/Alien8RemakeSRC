@@ -24,9 +24,6 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
 		<Unit filename="Alien8.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -42,6 +39,7 @@
 		<Unit filename="juego.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="mapa.h" />
 		<Unit filename="tcj.c">
 			<Option compilerVar="CC" />
 		</Unit>
