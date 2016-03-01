@@ -1567,14 +1567,17 @@ void cargar_hab(void)
     ism_colocar_objeto_rejilla(6,0,0,1000,NULL,NULL);
     ism_colocar_objeto_rejilla(7,0,0,1000,NULL,NULL);
     ism_colocar_objeto_rejilla(8,0,0,1000,NULL,NULL);
-    if(puertas&0x01)
+    if(puertas&0x01)//Hay puerta arriba dere
      {
+         printf("Puertas 0x01 SI\n");fflush(NULL);
+
       ism_colocar_loseta(mp_loseta,4,0);
       ism_colocar_loseta(mp_loseta,5,0);
       puerta[0]=1;
      }
     else
      {
+      printf("Puertas 0x01 NO\n");fflush(NULL); //Muro invisible para que no salir por donde habria una puerta
       ism_colocar_objeto_rejilla(4,0,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(5,0,0,1000,NULL,NULL);
      }
@@ -1626,12 +1629,14 @@ void cargar_hab(void)
     ism_colocar_objeto_rejilla(9,8,0,1000,NULL,NULL);
     if(puertas&0x02)
      {
+      printf("Puertas 0x02 SI\n");fflush(NULL);
       ism_colocar_loseta(mp_loseta,9,4);
       ism_colocar_loseta(mp_loseta,9,5);
       puerta[1]=1;
      }
     else
      {
+      printf("Puertas 0x02 NO\n");fflush(NULL);
       ism_colocar_objeto_rejilla(9,4,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(9,5,0,1000,NULL,NULL);
      }
@@ -1643,12 +1648,14 @@ void cargar_hab(void)
     ism_colocar_objeto_rejilla(8,9,0,1000,NULL,NULL);
     if(puertas&0x04)
      {
+          printf("Puertas 0x04 SI\n");fflush(NULL);
       ism_colocar_loseta(mp_loseta,4,9);
       ism_colocar_loseta(mp_loseta,5,9);
       puerta[2]=1;
      }
     else
      {
+          printf("Puertas 0x04 NO\n");fflush(NULL);
       ism_colocar_objeto_rejilla(4,9,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(5,9,0,1000,NULL,NULL);
      }
@@ -1660,12 +1667,14 @@ void cargar_hab(void)
     ism_colocar_objeto_rejilla(0,8,0,1000,NULL,NULL);
     if(puertas&0x08)
      {
+          printf("Puertas 0x08 SI\n");fflush(NULL);
       ism_colocar_loseta(mp_loseta,0,4);
       ism_colocar_loseta(mp_loseta,0,5);
       puerta[3]=1;
      }
     else
      {
+          printf("Puertas 0x08 NO\n");fflush(NULL);
       ism_colocar_objeto_rejilla(0,4,0,1000,NULL,NULL);
       ism_colocar_objeto_rejilla(0,5,0,1000,NULL,NULL);
      }
@@ -1761,10 +1770,6 @@ void cargar_hab(void)
      {
       ism_establecer_rejilla(10,4,ANCHO_CELDA);
 
-      fputs("ASDF",stdout);fflush(NULL);
-      line(buffer, 12,3, 80, 100,4);//v2
-        fputs("ASDF2",stdout);fflush(NULL);
-
       oscuridad=0;
       dx=1;dy=0;
       x_org=X_ORG-ANCHO_CELDA*3*2;
@@ -1830,7 +1835,8 @@ void cargar_hab(void)
   primera_cascara=primera_mina_voladora=-1;
   num_obst=0;
   num_movs=6;
-  rx=dx; ry=dy;
+  rx=dx; ry=dy;//v2 offset 0 o 1 indicando si es pasillo o no, mas o menos
+  printf("Cargar hab: dx dy: %d %d\n",dx,dy);fflush(NULL);
   for(f=(h?hab[h-1].n:0);f<hab[h].n;f++)    //v2:Importante: ver comienzo de ini_juego. Offset objeto inicial y offset del obj final
    {int z=ENCIMA;
     //printf("Objeto %d\n",f);fflush(NULL);
@@ -1838,6 +1844,15 @@ void cargar_hab(void)
      {
       rx = (mapa_obj[f] & 0x07) + dx;
       ry = ((mapa_obj[f] >> 3) & 0x07) + dy;
+
+      printf("Objeto en x y: %d %d\n",rx,ry);fflush(NULL);
+      if (  (dx==1) && (dy==1)   ){//v2 girar todas:
+            //PAra las cuadradas, rx y ry estara entre [1,8]
+            rx=8-rx;
+            ry=8-ry;
+            printf("Cambiado a %d %d\n",rx,ry);fflush(NULL);
+
+      }
       f++;
      }
 
