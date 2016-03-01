@@ -12,7 +12,10 @@ struct{
  unsigned short n;        // Número de objetos en la habitación. V2: se sobreescribe luego por offset del ultimo objeto
 
  unsigned char x_p;       // Los cuatro bits más significativos indican la coordenada
-                          // x de la habitación. Los otros, la configuración de las puertas.
+                          // x de la habitación. Los otros, la configuración de las puertas.//v2:   bit 1 puerta ARRIBA-DERE
+                                                                                            //      bit 2 puerta abajo DERE
+                                                                                            //      bit 4 puerta abajo izq
+                                                                                            //      bit 8 puerta ARRIBA IZQ
 
  unsigned char tipo;      // Tipo de habitación cuadrada (paredes y suelo)
  unsigned char banderas; // Banderas varias.
@@ -93,7 +96,7 @@ struct{
 #define HAB_REPROGRAMANDO 128
 
 // Defines de coordenadas de columna
-#define COL00 192
+#define COL00 192       //v2: 11yy yxxx 3 bits mas bajos para x, y otros 3 para y. Ver cargar hab
 #define COL10 193
 #define COL20 194
 #define COL30 195
