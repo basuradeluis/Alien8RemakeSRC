@@ -156,7 +156,7 @@ char sonido_interferencia;
 char sonido_empujar;
 char sonido_autom;
 char trampas;
-char inmune=0;
+char inmune=0,girarHabitacion=0;
 
 void mov_nacho_andar(char f);
 void mov_nacho_saltar(char f);
@@ -298,7 +298,7 @@ char juego(void)
  dt_anim_nacho.cont=dt_anim_nacho.fot=dt_anim_nacho.tipo=dt_anim_nacho.dirini=0;
 
  int dibujarLineas=0, pulsadoDibujarLineas=0;
- int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0, pulsadoActivarInmune=0;
+ int pulsadoF10=0,pulsadoF9=0,pulsadoActivarTrampas=0, pulsadoActivarInmune=0, pulsadoGirarHabitacion=0;
 
  if(nuevo_marcador)
   {
@@ -377,6 +377,17 @@ char juego(void)
    if (   !(key[KEY_8]) && !(key[KEY_F12])   ){
         pulsadoDibujarLineas=0;
    }
+
+   if (  (pulsadoGirarHabitacion==0) && (key[KEY_9]) && (key[KEY_F12])   ){
+        girarHabitacion=(girarHabitacion+1)%2;
+        pulsadoGirarHabitacion=1;
+   }
+   if (   !(key[KEY_9]) && !(key[KEY_F12])   ){
+        pulsadoGirarHabitacion=0;
+   }
+
+
+
 
    if (dibujarLineas){//v2: dibujar lineas orientativas
        if (hab[h].banderas&1){//Cuadrada (ver cargar_hab):
@@ -1835,23 +1846,39 @@ void cargar_hab(void)
   primera_cascara=primera_mina_voladora=-1;
   num_obst=0;
   num_movs=6;
-  rx=dx; ry=dy;//v2 offset 0 o 1 indicando si es pasillo o no, mas o menos
+  rx=dx; ry=dy;//v2 offset 0 o 1 indicando si es pasillo o no, mas o menos; o si hay desplazamiento por baldosa de puerta
+  //Ojo , en algunas habitaciones, como en la 12, no se pone primero COLXY y luego objeto, sino que se pone directamente objeto
+  //aprovechando que dx y dy , y por lo tanto rx ry, valen 1 1
   printf("Cargar hab: dx dy: %d %d\n",dx,dy);fflush(NULL);
   for(f=(h?hab[h-1].n:0);f<hab[h].n;f++)    //v2:Importante: ver comienzo de ini_juego. Offset objeto inicial y offset del obj final
    {int z=ENCIMA;
     //printf("Objeto %d\n",f);fflush(NULL);
+
+    printf("Objeto en x y: %d %d\n",rx,ry);fflush(NULL);
+    /*if (  (hab[h].banderas&1) & girarHabitacion  ){//v2 girar todas:
+            //1.1 -> 9.9
+            rx=10-rx;//girar //para las cuadradas, rx y ry estara entre [0,7]
+            ry=10-ry;
+
+            printf("especial Cambiado a %d %d\n",rx,ry);fflush(NULL);
+    }*/
+
+
     if(mapa_obj[f]>=COL00) // Cambio x/y
      {
       rx = (mapa_obj[f] & 0x07) + dx;
       ry = ((mapa_obj[f] >> 3) & 0x07) + dy;
+      if (  (hab[h].banderas&1) & girarHabitacion  ){//v2 girar todas:
 
-      printf("Objeto en x y: %d %d\n",rx,ry);fflush(NULL);
-      if (  (dx==1) && (dy==1)   ){//v2 girar todas:
-            //PAra las cuadradas, rx y ry estara entre [1,8]
-            rx=8-rx;
-            ry=8-ry;
-            printf("Cambiado a %d %d\n",rx,ry);fflush(NULL);
+            rx=rx-dx;
+            ry=ry-dy;
 
+            rx=7-rx;  //girar //para las cuadradas, rx y ry estara entre [0,7]
+            ry=7-ry;
+            rx=rx+dx;
+            ry=ry+dy;
+
+            printf("Girado a %d %d\n",rx,ry);fflush(NULL);
       }
       f++;
      }

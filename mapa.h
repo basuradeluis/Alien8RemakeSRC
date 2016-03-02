@@ -165,7 +165,7 @@ struct{
 #define ELEV0 0x80
 #define ELEV1 0x81
 #define ELEV2 0x82
-#define ELEV3 0x83
+#define ELEV3 0x83 //131 dec
 #define ELEV4 0x84
 #define ELEV5 0x85
 #define ELEV6 0x86
@@ -177,7 +177,7 @@ struct{
 #define ELEVC 0x8c
 #define ELEVD 0x8d
 #define ELEVE 0x8e
-#define ELEVF 0x8f
+#define ELEVF 0x8f//143
 
 // Objeto normal estático
 #define NOR00  0
