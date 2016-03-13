@@ -79,6 +79,11 @@ int globalLuisJugarDirectamente=0;
      //TODO extraer img
 
      for (i=0;i<argc;i++){
+
+        if ( !(strcasecmp(argv[i],"-help")) || !(strcasecmp(argv[i],"--help")) ){
+             exit(0);
+        }
+
         if (!(strcasecmp(argv[i],"-nosound"))){
              globalLuisSonidoDesactivado=1;
         }
@@ -115,6 +120,8 @@ int main(int argc, const char* argv[] )
  char estado=EST_MENU;
 
 
+ luisComprobarParametros(argc,argv);
+
  allegro_init();
  set_uformat(U_ASCII);
  leer_cfg();
@@ -123,14 +130,12 @@ int main(int argc, const char* argv[] )
      return -1;
  }
 
- luisComprobarParametros(argc,argv);
-
  if (globalLuisJugarDirectamente)
     estado=EST_JUEGO;
 
  if(comprobar_dats()){
-     printf("Faltans dats\n");
-    return -1;
+        printf("Faltans dats\n");
+        return -1;
  }
  ini_juego();
  ini_tiempo();
