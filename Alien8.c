@@ -64,7 +64,9 @@ int globalLuisJugarDirectamente=0;
 
      fflush( stdout );
 
-    //TODO girar habitacion (en progreso/beta)
+    //TODO girar habitacion (en progreso/beta. Tiene un fallo con el hecho de que algunos objetos no tengan coordenada inicial en el
+    //arrary mapa.h y se asuma posiionc 0,0 (1,1; no recuerdo)
+
     //TODO hace que inmune no sea afectado ni por desplazamiento de algunas baldosas ni las hace desaparecer
      //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi.-> La puerta es dificil
      //TODO volar

@@ -4073,7 +4073,7 @@ void mov_nacho_fotograma(void)
    //printf("Fotog: %d,%d\n",auxL,  movs[0].dir *5+ fot_nacho[dt_anim_nacho.fot] );
 
    if (inmune){
-        ism_cambiar_mapa_objeto(movs[0].id, f_anim[139].dat);
+        ism_cambiar_mapa_objeto(movs[0].id, f_anim[140+(movs[0].dir)].dat);
                                             // o 135 f_anim[138].dat)
    }
    else
