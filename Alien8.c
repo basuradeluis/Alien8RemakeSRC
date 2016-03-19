@@ -64,12 +64,12 @@ int globalLuisJugarDirectamente=0;
 
      fflush( stdout );
 
-    //TODO girar habitacion (en progreso)
+    //TODO girar habitacion (en progreso/beta)
     //TODO hace que inmune no sea afectado ni por desplazamiento de algunas baldosas ni las hace desaparecer
      //TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas ahi.-> La puerta es dificil
      //TODO volar
 
-     //TODO knightlore usar grafico de otro robot
+     //TODO knightlore mode, usar grafico de otro robot
      //TODO al pulsar cierta tecla ir a habitacion X
      //TODO hacer aparecer objeto X
      //TODO grabar partida

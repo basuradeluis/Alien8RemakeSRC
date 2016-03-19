@@ -114,9 +114,17 @@ struct{
  char dir;
  short g;
  char empujable;
- char tipoObjeto;
+ char tipoObjeto;//LUIS NUEVO NO USADO
  //LUIS
 } movs[MAX_MOVS];
+
+
+/**
+.dir:   0: SurEste
+        1: SurOeste
+        2: NorOest
+        3: NorEste
+**/
 char primera_cascara; // Índice de la primera cascara.
 char primera_mina_voladora; // Índice de la primera mina voladora.
 
@@ -128,6 +136,9 @@ struct{
  char dirini;
 } dt_anim_nacho;
 char fot_nacho[17]={2,3,3,4,4,3,3,2,2,1,1,0,0,1,1,2,2};
+//Hace una correspondencia entre los 5 fotogramas que hay para la animacion de nacho
+//al andar. Ver nachoandarfotograma
+//char fot_nacho[17]={2,3,4,3,2,1,0,1,2,3,4,3,2,1,0,1,2};//Animacion "mas rapida"
 
 // Identificadores de las jambas de las puertas
 ism_id id_jamba[8];
@@ -4056,7 +4067,18 @@ void mov_nacho_fotograma(void)
     {reproducir_sonido(24,PLAYMODE_PLAY);}
    else if(dt_anim_nacho.fot==8)
     {reproducir_sonido(25,PLAYMODE_PLAY);}
-   ism_cambiar_mapa_objeto(movs[0].id,fm_nacho(movs[0].dir,fot_nacho[dt_anim_nacho.fot]));
+
+
+   //int auxL=fot_nacho[dt_anim_nacho.fot];fflush(NULL);
+   //printf("Fotog: %d,%d\n",auxL,  movs[0].dir *5+ fot_nacho[dt_anim_nacho.fot] );
+
+   if (inmune){
+        ism_cambiar_mapa_objeto(movs[0].id, f_anim[139].dat);
+                                            // o 135 f_anim[138].dat)
+   }
+   else
+        ism_cambiar_mapa_objeto(movs[0].id,fm_nacho(movs[0].dir,fot_nacho[dt_anim_nacho.fot]));
+
    dt_anim_nacho.fot=(dt_anim_nacho.fot==16?0:dt_anim_nacho.fot+1);
   }
 }
